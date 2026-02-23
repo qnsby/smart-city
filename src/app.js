@@ -13,13 +13,8 @@ const app = express();
 app.use(express.json());
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
-
 app.use("/auth", authRouter);
-
-// protected routes
 app.use("/tickets", authRequired, ticketsRouter);
-
-// analytics should be restricted
 app.use("/analytics", authRequired, requireRoles("DEPT_ADMIN", "SUPERVISOR"), analyticsRouter);
 
 const port = Number(process.env.PORT || 3000);

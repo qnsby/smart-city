@@ -1,34 +1,22 @@
-const express = require("express");
-const { db } = require("../db");
+const { Router } = require("express");
+const analyticsController = require("../controllers/analytics");
+const { authRequired } = require("../middleware/auth");
+const { requireRoles } = require("../middleware/rbac");
 
-const router = express.Router();
+const router = Router();
 
-// GET /analytics/h3?date=YYYY-MM-DD
-router.get("/h3", (req, res) => {
-  const date = String(req.query.date || new Date().toISOString().slice(0, 10));
-  const rows = db.prepare(`
-    SELECT h3_index, ticket_count
-    FROM h3_aggregates
-    WHERE date=?
-    ORDER BY ticket_count DESC
-    LIMIT 200
-  `).all(date);
+router.get(
+  "/h3",
+  authRequired,
+  requireRoles("DEPT_ADMIN", "SUPERVISOR"),
+  analyticsController.getH3Analytics
+);
 
-  res.json({ date, count: rows.length, items: rows });
-});
-
-// GET /analytics/top-cells?date=...
-router.get("/top-cells", (req, res) => {
-  const date = String(req.query.date || new Date().toISOString().slice(0, 10));
-  const rows = db.prepare(`
-    SELECT h3_index, ticket_count
-    FROM h3_aggregates
-    WHERE date=?
-    ORDER BY ticket_count DESC
-    LIMIT 10
-  `).all(date);
-
-  res.json({ date, items: rows });
-});
+router.get(
+  "/top-cells",
+  authRequired,
+  requireRoles("DEPT_ADMIN", "SUPERVISOR"),
+  analyticsController.getTopCells
+);
 
 module.exports = { analyticsRouter: router };
