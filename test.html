@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart City CRUD Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        input, button, textarea { margin: 5px 0; display: block; }
+        textarea { width: 400px; height: 120px; }
+    </style>
+</head>
+<body>
+
+<h2>Smart City API Tester</h2>
+
+<h3>1. Login</h3>
+<input id="loginName" placeholder="Name (Citizen A)" />
+<input id="loginPassword" placeholder="Password (pass123)" type="password" />
+<button onclick="login()">Login</button>
+
+<h3>JWT Token</h3>
+<textarea id="token"></textarea>
+
+<hr>
+
+<h3>2. Create Ticket</h3>
+<input id="title" placeholder="Title" />
+<input id="category" placeholder="Category (WATER)" />
+<input id="lat" placeholder="Latitude" />
+<input id="lng" placeholder="Longitude" />
+<button onclick="createTicket()">Create</button>
+
+<hr>
+
+<h3>3. Get Ticket by ID</h3>
+<input id="ticketId" placeholder="Ticket ID" />
+<button onclick="getTicket()">Get</button>
+
+<hr>
+
+<h3>4. Update Status</h3>
+<input id="status" placeholder="NEW / DONE / IN_PROGRESS" />
+<button onclick="updateStatus()">Update</button>
+
+<hr>
+
+<h3>5. Get Analytics (Admin/Supervisor)</h3>
+<button onclick="getAnalytics()">Get H3 Analytics</button>
+
+<hr>
+
+<h3>Response</h3>
+<textarea id="response"></textarea>
+
+<script>
+const API = "http://localhost:3000";
+
+async function login() {
+    const res = await fetch(API + "/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            name: document.getElementById("loginName").value,
+            password: document.getElementById("loginPassword").value
+        })
+    });
+
+    const data = await res.json();
+    document.getElementById("token").value = data.token || JSON.stringify(data);
+}
+
+function getAuthHeaders() {
+    return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + document.getElementById("token").value
+    };
+}
+
+async function createTicket() {
+    const res = await fetch(API + "/tickets", {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+            title: document.getElementById("title").value,
+            category: document.getElementById("category").value,
+            latitude: parseFloat(document.getElementById("lat").value),
+            longitude: parseFloat(document.getElementById("lng").value)
+        })
+    });
+
+    const data = await res.json();
+    document.getElementById("response").value = JSON.stringify(data, null, 2);
+
+    if (data.id) {
+        document.getElementById("ticketId").value = data.id;
+    }
+}
+
+async function getTicket() {
+    const id = document.getElementById("ticketId").value;
+    const res = await fetch(API + "/tickets/" + id, {
+        headers: getAuthHeaders()
+    });
+
+    const data = await res.json();
+    document.getElementById("response").value = JSON.stringify(data, null, 2);
+}
+
+async function updateStatus() {
+    const id = document.getElementById("ticketId").value;
+    const res = await fetch(API + "/tickets/" + id + "/status", {
+        method: "PATCH",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+            status: document.getElementById("status").value
+        })
+    });
+
+    const data = await res.json();
+    document.getElementById("response").value = JSON.stringify(data, null, 2);
+}
+
+async function getAnalytics() {
+    const res = await fetch(API + "/analytics/h3", {
+        headers: getAuthHeaders()
+    });
+
+    const data = await res.json();
+    document.getElementById("response").value = JSON.stringify(data, null, 2);
+}
+</script>
+
+</body>
+</html>
