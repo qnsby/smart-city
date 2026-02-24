@@ -9,6 +9,26 @@ const { authRequired } = require("./middleware/auth");
 require("./events/handlers");
 
 const app = express();
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const allowedOrigins = new Set(["http://localhost:5173"]);
+
+  if (origin && allowedOrigins.has(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  }
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 app.use((req, res, next) => {

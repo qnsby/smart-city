@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+.input {
+  @apply w-full rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-emerald-400;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
