@@ -25,7 +25,8 @@ const users = [
   upsertUser({ name: "Operator", role: "OPERATOR", department_id: "OPS", password: "pass123" }),
   upsertUser({ name: "Dept Admin", role: "DEPT_ADMIN", department_id: "WATER", password: "pass123" }),
   upsertUser({ name: "Field Worker", role: "FIELD_WORKER", department_id: "WATER", password: "pass123" }),
-  upsertUser({ name: "Supervisor", role: "SUPERVISOR", department_id: null, password: "pass123" })
+  upsertUser({ name: "Supervisor", role: "SUPERVISOR", department_id: null, password: "pass123" }),
+  upsertUser({ name: "superadmin", role: "superadmin", department_id: null, password: "superadmin" }),
 ];
 
 console.log("✅ Seed done. Demo accounts:");

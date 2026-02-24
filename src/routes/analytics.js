@@ -8,14 +8,14 @@ const router = Router();
 router.get(
   "/h3",
   authRequired,
-  requireRoles("DEPT_ADMIN", "SUPERVISOR"),
+  requireRoles("DEPT_ADMIN", "SUPERVISOR", "superadmin"),
   analyticsController.getH3Analytics
 );
 
 router.get(
   "/top-cells",
   authRequired,
-  requireRoles("DEPT_ADMIN", "SUPERVISOR"),
+  requireRoles("DEPT_ADMIN", "SUPERVISOR", "superadmin"),
   analyticsController.getTopCells
 );
 

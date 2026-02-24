@@ -1,0 +1,223 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart City Issue Reporting & Analytics Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <div>
+        <p class="eyebrow">Advanced Project Management • Assignment 1</p>
+        <h1>Smart City Issue Reporting & Analytics Platform</h1>
+        <p class="muted">Centralized citizen issue reporting, workflow management, H3 indexing, analytics, RBAC/ABAC, and audit logging.</p>
+        <div class="tags">
+          <span>GovTech</span><span>Express + SQLite</span><span>H3 Analytics</span><span>Event-Driven</span>
+        </div>
+      </div>
+      <div class="hero__stats">
+        <div><small>Timeline</small><strong>14 Weeks</strong></div>
+        <div><small>Architecture</small><strong>Microservices-oriented</strong></div>
+        <div><small>Core Event</small><strong>ticket_created</strong></div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel" id="report">
+      <div class="section-head">
+        <h2>Report Summary</h2>
+        <p class="muted">Structured content from your kickoff report for presentation and demonstration.</p>
+      </div>
+      <div class="grid cols-2">
+        <article class="card">
+          <h3>Team</h3>
+          <ul>
+            <li>Konysbay Dias — Fullstack Developer</li>
+            <li>Kenzhebekova Adina — UX/UI Designer / Frontend Developer</li>
+            <li>Kaiyrbergen Yerdaulet — Project Manager / Data Analyst</li>
+            <li>Tolegen Nurdaulet — Backend Developer</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Problem & Goals</h3>
+          <ul>
+            <li>Centralize issue intake across disconnected citizen channels.</li>
+            <li>Track workflow transparently with role-based institutional processes.</li>
+            <li>Use H3 for fast spatial analytics and hotspot detection.</li>
+            <li>Support institutional constraints with auditability and access control.</li>
+          </ul>
+        </article>
+      </div>
+      <div class="grid cols-3">
+        <article class="card">
+          <h3>Expected Outputs</h3>
+          <ul>
+            <li>Functional backend system</li>
+            <li>H3-based indexing</li>
+            <li>RBAC implementation</li>
+            <li>Event-driven workflow simulation</li>
+            <li>Audit logging system</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Challenges</h3>
+          <ul>
+            <li>Institutional-grade architecture design</li>
+            <li>Correct H3 integration</li>
+            <li>RBAC/ABAC enforcement</li>
+            <li>Event components and delivery timeline</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Critical Failure Scenario</h3>
+          <p class="muted">If event-driven ticket processing fails, assignment and aggregation updates may be delayed. The report proposes persistent event storage and retry mechanisms.</p>
+        </article>
+      </div>
+      <article class="card">
+        <h3>14-Week Implementation Plan</h3>
+        <div class="timeline">
+          <div><b>Weeks 1-2:</b> Research, stakeholders, boundaries, metrics, H3 requirements.</div>
+          <div><b>Weeks 3-4:</b> UI design, DB schema, workflow and RBAC/ABAC definitions.</div>
+          <div><b>Weeks 5-6:</b> Backend foundation, JWT auth, DB setup, test dataset.</div>
+          <div><b>Weeks 7-8:</b> Issue reporting + geolocation to H3 + frontend/backend integration.</div>
+          <div><b>Weeks 9-10:</b> Workflow automation, event bus integration, audit logging.</div>
+          <div><b>Weeks 11-12:</b> Analytics layer, H3 aggregation endpoints, visualization hookup.</div>
+          <div><b>Week 13:</b> Testing, security validation, optimization.</div>
+          <div><b>Week 14:</b> Finalization, documentation, demo preparation.</div>
+        </div>
+      </article>
+      <div class="grid cols-2">
+        <article class="card">
+          <h3>Architecture</h3>
+          <ul>
+            <li>Authentication & Identity Service</li>
+            <li>Ticket Management Service</li>
+            <li>Analytics & Aggregation Service</li>
+            <li>Database Layer</li>
+            <li>Internal Event Bus</li>
+          </ul>
+          <p class="muted">Current deployment is a single app, but logically separated for future distributed scaling.</p>
+        </article>
+        <article class="card">
+          <h3>Security & IAM</h3>
+          <ul>
+            <li>RBAC roles: Citizen, Operator, Dept Admin, Field Worker, Supervisor</li>
+            <li>ABAC rule: field worker can access only assigned department tickets</li>
+            <li>IDOR risk mitigated via centralized authorization checks</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" id="dashboard">
+      <div class="section-head">
+        <h2>Live API Demo Dashboard</h2>
+        <p class="muted">This frontend calls your current Express endpoints directly.</p>
+      </div>
+      <div class="grid cols-2">
+        <article class="card">
+          <h3>Login</h3>
+          <form id="loginForm" class="stack">
+            <input id="loginName" placeholder="Name (e.g. Citizen A)" required />
+            <input id="loginPassword" type="password" placeholder="Password (e.g. pass123)" required />
+            <div class="row">
+              <button class="btn" type="submit">Login</button>
+              <button class="btn btn-alt" type="button" id="logoutBtn">Logout</button>
+            </div>
+          </form>
+          <div class="chips">
+            <button type="button" data-demo="Citizen A|pass123">Citizen</button>
+            <button type="button" data-demo="Operator|pass123">Operator</button>
+            <button type="button" data-demo="Dept Admin|pass123">Dept Admin</button>
+            <button type="button" data-demo="Field Worker|pass123">Field Worker</button>
+            <button type="button" data-demo="Supervisor|pass123">Supervisor</button>
+          </div>
+          <pre id="authOut" class="out"></pre>
+        </article>
+        <article class="card">
+          <h3>Create Ticket</h3>
+          <form id="ticketForm" class="stack">
+            <input name="title" placeholder="Pothole near crosswalk" required />
+            <input name="category" placeholder="ROAD / WATER / LIGHTING" value="ROAD" required />
+            <textarea name="description" rows="3" placeholder="Describe the issue"></textarea>
+            <div class="row row-stretch">
+              <input name="latitude" type="number" step="any" value="43.2389" required />
+              <input name="longitude" type="number" step="any" value="76.8897" required />
+            </div>
+            <button class="btn" type="submit">Create Ticket</button>
+          </form>
+          <p class="muted tiny">Creating a ticket triggers H3 indexing and the internal event bus handler.</p>
+        </article>
+      </div>
+
+      <div class="grid cols-2">
+        <article class="card">
+          <h3>Tickets</h3>
+          <div class="row row-stretch">
+            <input id="h3Filter" placeholder="Optional H3 filter" />
+            <button class="btn btn-alt" id="loadTicketsBtn" type="button">Load</button>
+          </div>
+          <div id="ticketsTable" class="tableWrap"></div>
+        </article>
+        <article class="card">
+          <h3>Ticket Actions</h3>
+          <div class="stack">
+            <input id="ticketId" placeholder="Ticket ID" />
+            <div class="row">
+              <button class="btn btn-alt" id="getTicketBtn" type="button">Get Ticket</button>
+              <button class="btn btn-alt" id="getAuditBtn" type="button">Get Audit</button>
+            </div>
+            <div class="row">
+              <select id="statusSelect">
+                <option>NEW</option>
+                <option>IN_PROGRESS</option>
+                <option>DONE</option>
+                <option>REJECTED</option>
+              </select>
+              <button class="btn" id="updateStatusBtn" type="button">Update Status</button>
+            </div>
+          </div>
+          <pre id="ticketOut" class="out"></pre>
+          <pre id="auditOut" class="out"></pre>
+        </article>
+      </div>
+
+      <div class="grid cols-2">
+        <article class="card">
+          <h3>Analytics (H3 Aggregates)</h3>
+          <div class="row">
+            <input id="analyticsDate" type="date" />
+            <button class="btn" id="loadH3Btn" type="button">H3 Analytics</button>
+            <button class="btn btn-alt" id="loadTopBtn" type="button">Top Cells</button>
+          </div>
+          <div id="analyticsTable" class="tableWrap"></div>
+        </article>
+        <article class="card">
+          <h3>Role Matrix (From Report)</h3>
+          <div class="tableWrap">
+            <table>
+              <thead><tr><th>Role</th><th>Create</th><th>Update</th><th>View Tickets</th><th>Analytics</th></tr></thead>
+              <tbody>
+                <tr><td>Citizen</td><td>Yes</td><td>No</td><td>Own only</td><td>No</td></tr>
+                <tr><td>Operator</td><td>Yes</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+                <tr><td>Dept Admin</td><td>Yes</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+                <tr><td>Field Worker</td><td>No</td><td>Assigned only</td><td>Assigned only</td><td>No</td></tr>
+                <tr><td>Supervisor</td><td>No</td><td>No</td><td>System oversight</td><td>Yes</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">Smart City frontend demo integrated into the backend API.</footer>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+﻿:root{
+  --bg:#071218;--panel:#0f1d26;--panel2:#132531;--text:#ecf7fb;--muted:#9fb8c5;
+  --line:rgba(159,184,197,.18);--accent:#38d39f;--accent2:#47b8ff;--danger:#ff7262;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Space Grotesk",sans-serif;color:var(--text);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(56,211,159,.12), transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(71,184,255,.14), transparent 40%),
+    linear-gradient(180deg,#071218,#09141c 50%,#071218);
+}
+.hero,.panel,.footer{width:min(1180px,calc(100% - 24px));margin:0 auto}
+.hero{padding:18px 0 8px}
+.hero__inner{
+  display:grid;grid-template-columns:1.6fr 1fr;gap:14px;
+  background:linear-gradient(180deg,rgba(19,37,49,.95),rgba(11,22,29,.96));
+  border:1px solid var(--line);border-radius:18px;padding:18px;
+  box-shadow:0 12px 40px rgba(0,0,0,.26);
+}
+.eyebrow{margin:0;color:var(--accent);font-size:.8rem;text-transform:uppercase;letter-spacing:.05em}
+h1{margin:.45rem 0 .5rem;font-size:clamp(1.5rem,2.6vw,2.5rem);line-height:1.06}
+.muted{color:var(--muted)}
+.tiny{font-size:.86rem}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tags span{border:1px solid var(--line);padding:5px 9px;border-radius:999px;color:var(--muted);font-size:.82rem;background:rgba(255,255,255,.02)}
+.hero__stats{display:grid;gap:10px}
+.hero__stats div{border:1px solid var(--line);border-radius:12px;padding:10px;background:rgba(255,255,255,.02)}
+.hero__stats small{display:block;color:var(--muted);margin-bottom:4px}
+.hero__stats strong{font-size:.98rem}
+main{display:grid;gap:14px;padding:6px 0 22px}
+.panel{background:rgba(12,24,32,.8);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 28px rgba(0,0,0,.18)}
+.section-head h2{margin:0}.section-head p{margin:.35rem 0 0}
+.grid{display:grid;gap:12px;margin-top:12px}
+.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{background:linear-gradient(180deg,rgba(19,37,49,.88),rgba(13,25,33,.92));border:1px solid var(--line);border-radius:14px;padding:12px}
+.card h3{margin:0 0 10px;font-size:1rem}
+.card ul{margin:0;padding-left:18px;line-height:1.45}
+.card p{margin:0;line-height:1.45}
+.timeline{display:grid;gap:8px;font-size:.94rem}
+.timeline div{padding:8px 10px;border:1px solid rgba(255,255,255,.05);border-radius:10px;background:rgba(255,255,255,.02)}
+.stack{display:grid;gap:8px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row-stretch>*{flex:1}
+input,textarea,select,button{font:inherit}
+input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(159,184,197,.24);background:rgba(5,12,16,.86);color:var(--text)}
+textarea{resize:vertical}
+.btn{padding:10px 12px;border-radius:10px;border:1px solid rgba(56,211,159,.32);background:linear-gradient(180deg,rgba(56,211,159,.26),rgba(56,211,159,.1));color:var(--text);cursor:pointer}
+.btn:hover{filter:brightness(1.06)}
+.btn-alt{border-color:rgba(71,184,255,.25);background:linear-gradient(180deg,rgba(71,184,255,.2),rgba(71,184,255,.08))}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chips button{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--text);border-radius:999px;padding:6px 10px;cursor:pointer}
+.out{margin-top:10px;min-height:68px;background:rgba(4,9,12,.9);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px;overflow:auto;white-space:pre-wrap;word-break:break-word;font-family:"IBM Plex Mono",monospace;font-size:.84rem}
+.tableWrap{overflow:auto;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:8px 7px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:top}
+th{color:var(--muted);font-weight:500}
+.footer{padding:8px 0 22px;color:var(--muted);font-size:.92rem}
+.err{color:var(--danger)}
+@media (max-width:980px){.hero__inner,.cols-2,.cols-3{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.hero__inner,.panel,.card{animation:fadeup .35s ease-out both}.panel:nth-child(2){animation-delay:.05s}.panel:nth-child(3){animation-delay:.1s}}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
