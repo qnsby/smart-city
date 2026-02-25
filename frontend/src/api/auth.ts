@@ -1,5 +1,6 @@
 import { apiClient } from "./client";
 import type { AuthLoginResponse, LoginPayload, RegisterPayload, User } from "../types";
+import { STORAGE_KEYS } from "../utils/constants";
 
 export async function loginApi(payload: LoginPayload) {
   const login = payload.login.trim();
@@ -12,11 +13,16 @@ export async function loginApi(payload: LoginPayload) {
 }
 
 export async function registerApi(payload: RegisterPayload) {
-  const { data } = await apiClient.post("/auth/register", payload);
-  return data;
+  void payload;
+  // Current backend does not implement registration.
+  throw new Error("Registration endpoint is not available on the current backend");
 }
 
 export async function getMeApi() {
-  const { data } = await apiClient.get<User>("/me");
-  return data;
+  // Current backend does not expose GET /me; use the cached session user.
+  const raw = localStorage.getItem(STORAGE_KEYS.user);
+  if (!raw) {
+    throw new Error("Current backend does not expose /me and no cached user is available");
+  }
+  return JSON.parse(raw) as User;
 }
