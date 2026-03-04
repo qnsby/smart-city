@@ -13,3 +13,7 @@ export function hasRequiredRole(userRole: Role, allowed?: Role[]) {
   if (!allowed || allowed.length === 0) return true;
   return allowed.includes(userRole);
 }
+
+export function isAdminRole(role: Role | null | undefined) {
+  return role === "dept_admin" || role === "university_admin";
+}

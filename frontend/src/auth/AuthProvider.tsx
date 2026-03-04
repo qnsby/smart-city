@@ -109,7 +109,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const register = async (payload: RegisterPayload) => {
     await registerApi(payload);
-    await login({ login: payload.email, password: payload.password });
+    await login({ login: payload.name, password: payload.password });
   };
 
   const value = useMemo<AuthContextValue>(

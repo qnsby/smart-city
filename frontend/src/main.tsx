@@ -13,6 +13,7 @@ import { MapPage } from "./pages/MapPage";
 import { IssueDetailsPage } from "./pages/IssueDetailsPage";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { AdminIssuesPage } from "./pages/AdminIssuesPage";
+import { AdminUsersPage } from "./pages/AdminUsersPage";
 import { USE_MSW } from "./utils/constants";
 import "./index.css";
 
@@ -45,7 +46,8 @@ const router = createBrowserRouter([
         element: <AppShell />,
         children: [
           { path: "/admin/dashboard", element: <AdminDashboardPage /> },
-          { path: "/admin/issues", element: <AdminIssuesPage /> }
+          { path: "/admin/issues", element: <AdminIssuesPage /> },
+          { path: "/admin/users", element: <AdminUsersPage /> }
         ]
       }
     ]

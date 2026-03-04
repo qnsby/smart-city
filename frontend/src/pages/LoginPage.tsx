@@ -24,7 +24,7 @@ export function LoginPage() {
     formState: { errors }
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { login: "Citizen A", password: "pass123" }
+    defaultValues: { login: "superadmin", password: "superadmin " }
   });
 
   const mutation = useMutation({
@@ -82,7 +82,7 @@ export function LoginPage() {
         </form>
 
         <div className="mt-5 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
-          Backend demo (nickname): Citizen A / pass123
+          Backend demo (nickname): superadmin / superadmin
           <br />
           MSW demo (email): citizen@example.com / password123
         </div>

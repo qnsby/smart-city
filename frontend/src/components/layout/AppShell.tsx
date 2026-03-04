@@ -1,10 +1,12 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
+import { isAdminRole } from "../../utils/roles";
 
 export function AppShell() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const isAdminArea = location.pathname.startsWith("/admin");
+  const admin = isAdminRole(user?.role);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -31,17 +33,18 @@ export function AppShell() {
         <aside className="rounded-2xl border border-slate-200 bg-white p-3 shadow-card">
           <nav className="space-y-1">
             <NavItem to="/map" label="Map & Reporting" />
-            <NavItem to="/admin/dashboard" label="Admin Dashboard" />
-            <NavItem to="/admin/issues" label="Admin Issues" />
+            {admin ? <NavItem to="/admin/dashboard" label="Admin Dashboard" /> : null}
+            {admin ? <NavItem to="/admin/issues" label="Admin Issues" /> : null}
+            {admin ? <NavItem to="/admin/users" label="Users" /> : null}
           </nav>
           <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
             <div className="font-medium text-slate-700">Role access</div>
             <div className="mt-1">
-              Citizen: map/reporting
+              Citizen: map/reporting only
               <br />
-              Dept Admin: issues + analytics
+              Dept Admin: issues + analytics + users
               <br />
-              University Admin: global admin
+              University Admin: full admin
             </div>
           </div>
         </aside>
