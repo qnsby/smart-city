@@ -1,39 +1,132 @@
-# Smart City – Urban Incident Management (Express + SQLite + H3)
+# Smart City Platform (Express + Supabase Postgres + React + H3)
 
-This project is a simplified but realistic backend for a Smart City institutional information system.
-It supports role-based access control (RBAC), attribute-based access control (ABAC),
-audit logging, event-driven processing, and H3 spatial indexing.
+Smart City is a full-stack incident management app:
+- citizens can report issues on the map
+- admins can track, update, and manage workflows
+- user access is controlled by RBAC
 
-## Key Features
-- Ticket creation with geolocation (lat/lng)
-- H3 indexing (stored in DB) + queries by H3 cell
-- Aggregation by H3 cell (heatmap-ready analytics)
-- RBAC / ABAC access control using JWT
-- Event-driven simulation (ticket_created → assignment + aggregation)
-- Audit log for accountability (minimum 2 actions)
+## Current Stack
 
-## Tech Stack
-- Node.js + Express
-- SQLite (better-sqlite3)
-- JWT (jsonwebtoken)
-- Password hashing (bcryptjs)
-- H3 indexing (h3-js)
+- Backend: Node.js, Express, JWT, `pg`, `h3-js`
+- Database: Supabase Postgres
+- Frontend: React, Vite, TypeScript, React Query, Tailwind
 
-## Roles
-- CITIZEN: can create tickets, view only own tickets
-- OPERATOR: can view tickets and update status
-- DEPT_ADMIN: can view tickets, update status, view analytics
-- FIELD_WORKER: can view/update only tickets assigned to their department/team (ABAC)
-- SUPERVISOR: can view analytics and system-wide overview
+## Roles (RBAC)
 
-## How H3 is used
-- On ticket creation, (latitude, longitude) is converted to an H3 cell id using `h3-js`.
-- The H3 cell id is stored in `tickets.h3_index`.
-- The API supports filtering tickets by `h3_index`.
-- Analytics aggregates ticket counts by `h3_index` per day in `h3_aggregates`.
+- `CITIZEN`: map/reporting, own tickets only
+- `DEPT_ADMIN`: admin dashboard, issues, users management
+- `SUPERVISOR`: admin dashboard, issues, users management
+- `SUPERADMIN`: full admin access
 
-## Setup
+Frontend role mapping:
+- `citizen` -> `CITIZEN`
+- `dept_admin` -> `DEPT_ADMIN`
+- `university_admin` -> `SUPERADMIN`
 
-### 1) Install dependencies
+## Main Features
+
+- JWT auth (`/auth/login`, `/auth/register`, `/auth/me`)
+- Tickets CRUD with H3 indexing
+- Event handler on ticket creation:
+  - auto-assign team by category
+  - increment H3 aggregates
+- Analytics endpoints (`/analytics/h3`, `/analytics/top-cells`)
+- Admin users API:
+  - `GET /admin/users`
+  - `PATCH /admin/users/:id`
+- Frontend admin users page: `/admin/users`
+
+## Project Structure
+
+- `backend/` - Express API + DB scripts
+- `frontend/` - React app
+
+## Environment
+
+Create `backend/.env`:
+
+```env
+PORT=3000
+JWT_SECRET=change_me
+H3_RESOLUTION=9
+SUPABASE_DB_URL=postgresql://postgres.<project_ref>:<password>@<pooler-host>:6543/postgres
+SUPABASE_SSL=true
+CORS_ORIGIN=http://localhost:5173
+```
+
+Create `frontend/.env`:
+
+```env
+VITE_API_URL=http://localhost:3000
+VITE_USE_MSW=false
+```
+
+Note:
+- For Supabase pooler use port `6543`.
+- If password has special chars (`@`, `:`, `/`, `#`), URL-encode it.
+
+## Install
+
 ```bash
 npm install
+npm --prefix backend install
+npm --prefix frontend install
+```
+
+## Database Init
+
+Run schema creation:
+
+```bash
+npm run init:db
+```
+
+Optional demo data:
+
+```bash
+npm run seed
+```
+
+## Run
+
+Backend:
+
+```bash
+npm run dev
+```
+
+Frontend:
+
+```bash
+npm --prefix frontend run dev
+```
+
+## API Overview
+
+- Auth:
+  - `POST /auth/login`
+  - `POST /auth/register`
+  - `GET /auth/me`
+- Tickets:
+  - `GET /tickets/getAll`
+  - `GET /tickets/get/:id`
+  - `POST /tickets/create`
+  - `PUT /tickets/update/:id`
+  - `DELETE /tickets/delete/:id`
+  - `GET /tickets/audit/:id`
+- Analytics:
+  - `GET /analytics/h3`
+  - `GET /analytics/top-cells`
+- Admin:
+  - `GET /admin/users`
+  - `PATCH /admin/users/:id`
+
+## Troubleshooting
+
+- `ENOTFOUND`:
+  - check host in `SUPABASE_DB_URL`
+  - prefer pooler host from Supabase dashboard
+- `28P01 password authentication failed`:
+  - wrong username/password pair
+  - for pooler username must include project ref (`postgres.<project_ref>`)
+  - reset DB password in Supabase and update `.env`
