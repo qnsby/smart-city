@@ -1,9 +1,14 @@
 const { Router } = require("express");
 const ticketsController = require("../controllers/tickets");
-const { authRequired } = require("../middleware/auth");     
-const { requireRoles } = require("../middleware/rbac");     
+const { authRequired } = require("../middleware/auth");
+const { requireRoles } = require("../middleware/rbac");
 
 const router = Router();
+const multer = require("multer");
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
 
 router.get("/getAll", authRequired, ticketsController.getAllTickets);
 router.get("/get/:id", authRequired, ticketsController.getTicketById);
@@ -12,6 +17,7 @@ router.post(
   "/create",
   authRequired,
   requireRoles("CITIZEN", "DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  upload.single("photo"),
   ticketsController.createTicket
 );
 

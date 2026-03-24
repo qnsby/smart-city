@@ -2,6 +2,7 @@ const { v4: uuid } = require("uuid");
 const { latLngToCell } = require("h3-js");
 const { query } = require("../db");
 const { bus } = require("../events/bus");
+const { uploadTicketPhoto, createSignedPhotoUrl } = require("../lib/supabase");
 
 const resolution = Number(process.env.H3_RESOLUTION || 9);
 
@@ -21,6 +22,15 @@ async function audit(userId, action, entityType, entityId, metaObj) {
       metaObj ? JSON.stringify(metaObj) : null
     ]
   );
+}
+
+async function attachPhotoUrl(ticket) {
+  if (!ticket) return ticket;
+
+  return {
+    ...ticket,
+    photo_url: ticket.photo_path ? await createSignedPhotoUrl(ticket.photo_path) : null
+  };
 }
 
 function warn(req, message, extra) {
@@ -43,10 +53,10 @@ const ticketsController = {
     const u = req.user;
     const filtered = result.rows.filter((ticket) => {
       if (u.role === "CITIZEN") return ticket.created_by === u.id;
-      return true;
+      return true
     });
-
-    return res.json({ count: filtered.length, items: filtered });
+    const items = await Promise.all(filtered.map(attachPhotoUrl));
+    return res.json({ count: items.length, items })
   },
 
   async getTicketById(req, res) {
@@ -62,12 +72,17 @@ const ticketsController = {
       return res.status(403).json({ error: "Forbidden (ownership)" });
     }
 
-    return res.json(ticket);
+    return res.json(await attachPhotoUrl(ticket));
   },
 
   async createTicket(req, res) {
-    const { title, description, category, latitude, longitude } = req.body || {};
-    if (!title || !category || typeof latitude !== "number" || typeof longitude !== "number") {
+    const title = req.body?.title;
+    const description = req.body?.desctiption;
+    const category = req.body?.category;
+    const latitude = Number(req.body?.latitude);
+    const longitude = Number(req.body?.longitude);
+
+    if (!title || !category || Number.isNaN(latitude) || Number.isNaN(longitude)) {
       warn(req, "createTicket validation failed", { body: req.body || null });
       return res.status(400).json({ error: "title, category, latitude(number), longitude(number) required" });
     }
@@ -76,12 +91,23 @@ const ticketsController = {
     const id = uuid();
     const created_at = new Date().toISOString();
 
+    let photo_path = null;
+    let photo_mime = null;
+    let photo_size = null;
+
+    if (req.file) {
+      photo_path = await uploadTicketPhoto({ ticketId: id, file: req.file });
+      photo_mime = req.file.mimetype;
+      photo_size = req.file.size;
+    }
+
     await query(
       `
         INSERT INTO tickets(
-          id, title, description, category, status, latitude, longitude, h3_index, created_by, assigned_team, created_at
+          id, title, description, category, status, latitude, longitude, h3_index,
+          created_by, assigned_team, photo_path, photo_mime, photo_size, created_at
         )
-        VALUES ($1, $2, $3, $4, 'NEW', $5, $6, $7, $8, NULL, $9)
+        VALUES ($1,$2,$3,$4, 'NEW', $5,$6,$7,$8,NULL,$9,$10,$11,$12)
       `,
       [
         id,
@@ -92,15 +118,23 @@ const ticketsController = {
         longitude,
         h3_index,
         req.user.id,
+        photo_path,
+        photo_mime,
+        photo_size,
         created_at
       ]
     );
 
-    await audit(req.user.id, "TICKET_CREATED", "TICKET", id, { category, h3_index });
-    bus.emit("ticket_created", { ticketId: id, h3_index, category: String(category).toUpperCase() });
+    await audit(req.user.id, "TICKET_CREATED", "TICKET", id, {
+      category,
+      h3_index,
+      has_photo: Boolean(photo_path)
+    });
+
+    bus.emit("ticket_created", { tickedId: id, h3_index, category: String(category).toUpperCase() });
 
     const created = await query("SELECT * FROM tickets WHERE id=$1", [id]);
-    return res.status(201).json(created.rows[0]);
+    return res.status(201).json(await attachPhotoUrl(created.rows[0]));
   },
 
   async updateTicketStatus(req, res) {

@@ -15,7 +15,7 @@ const authController = {
     }
 
     const result = await query(
-      "SELECT id, name, role, department_id, password_hash FROM users WHERE LOWER(name)=LOWER($1) LIMIT 1",
+      "SELECT id, name, email, role, department_id, password_hash FROM users WHERE LOWER(name)=LOWER($1) OR LOWER(email)=LOWER($1) LIMIT 1",
       [login]
     );
     const user = result.rows[0];
@@ -40,14 +40,16 @@ const authController = {
     console.log(`[AUTH] Login success: ${user.name} (${role})`);
     return res.json({
       token,
-      user: { id: user.id, name: user.name, role, department_id: user.department_id }
+      user: { id: user.id, name: user.name, email: user.email, role, department_id: user.department_id }
     });
   },
   async register(req, res) {
-    const { name, password } = req.body || {};
-    if (!name || !password) {
+    const { name, email, password } = req.body || {};
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+
+    if (!name || !normalizedEmail || !password) {
       console.warn("[AUTH] Registration failed: missing fields");
-      return res.status(400).json({ error: "name and password are required" });
+      return res.status(400).json({ error: "name, email and password are required" });
     }
 
     const existing = await query("SELECT id FROM users WHERE LOWER(name)=LOWER($1) LIMIT 1", [name]);
@@ -56,24 +58,32 @@ const authController = {
       return res.status(409).json({ error: "User already exists" });
     }
 
+    const existingEmail = await query("SELECT id FROM users WHERE LOWER(email)=LOWER($1) LIMIT 1", [
+      normalizedEmail
+    ]);
+    if (existingEmail.rows.length) {
+      console.warn(`[AUTH] Registration failed: email already exists (${normalizedEmail})`);
+      return res.status(409).json({ error: "Email already exists" });
+    }
+
     const id = uuid();
     const role = "CITIZEN";
     const hashedPassword = bcrypt.hashSync(password, 12);
     await query(
-      "INSERT INTO users (id, name, password_hash, role, department_id) VALUES ($1, $2, $3, $4, $5)",
-      [id, name, hashedPassword, role, null]
+      "INSERT INTO users (id, name, email, password_hash, role, department_id) VALUES ($1, $2, $3, $4, $5, $6)",
+      [id, name, normalizedEmail, hashedPassword, role, null]
     );
 
     console.log(`[AUTH] Registration success: ${name} (${role})`);
     return res.status(201).json({
-      user: { id, name, role, department_id: null }
+      user: { id, name, email: normalizedEmail, role, department_id: null }
     });
   },
   me(req, res) {
     return res.json({
       id: req.user.id,
       name: req.user.name,
-      email: "",
+      email: req.user.email,
       role: req.user.role,
       department_id: req.user.department_id
     });

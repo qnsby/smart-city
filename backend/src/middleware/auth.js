@@ -12,7 +12,7 @@ async function authRequired(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const result = await query("SELECT id, name, role, department_id FROM users WHERE id=$1", [
+    const result = await query("SELECT id, name, email, role, department_id FROM users WHERE id=$1", [
       payload.user_id
     ]);
     const user = result.rows[0];
@@ -33,3 +33,4 @@ async function authRequired(req, res, next) {
 }
 
 module.exports = { authRequired };
+

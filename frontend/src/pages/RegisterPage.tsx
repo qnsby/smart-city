@@ -1,99 +1,164 @@
-import type { ReactNode } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { ArrowLeft, Lock, Mail, User } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useAuth } from "../auth/AuthProvider";
 import { useToast } from "../components/ui/ToastProvider";
 
+import logo from "../assets/branding/logo.svg";
+import city from "../assets/city.png"
+
 const schema = z
   .object({
-    name: z.string().min(2),
-    email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8)
+    name: z.string().min(2, "Username must be at least 2 characters"),
+    email: z.string().email("Enter a valid email"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Confirm your password")
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: "Password do not match",
     path: ["confirmPassword"]
   });
+  type FormValues = z.infer<typeof schema>;
 
-type FormValues = z.infer<typeof schema>;
+  export function RegisterPage() {
+    const navigate = useNavigate();
+    const { register: registerUser } = useAuth();
+    const { push } = useToast();
 
-export function RegisterPage() {
-  const navigate = useNavigate();
-  const { register: registerUser } = useAuth();
-  const { push } = useToast();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema)
-  });
+    const {
+      register,
+      handleSubmit,
+      formState:{ errors }
+    } = useForm<FormValues>({
+      resolver: zodResolver(schema)
+    });
+    const mutation = useMutation({
+      mutationFn: async (values: FormValues) =>
+        registerUser({
+          name: values.name,
+          email: values.email,
+          password: values.password
+        }),
+      onSuccess: () => {
+        push("success", "Account created");
+        navigate("/map", {replace: true});
+      },
+      onError: () => push("error", "Register failed")
+    });
 
-  const mutation = useMutation({
-    mutationFn: async (values: FormValues) =>
-      registerUser({ name: values.name, email: values.email, password: values.password }),
-    onSuccess: () => {
-      push("success", "Account created");
-      navigate("/map", { replace: true });
-    },
-    onError: () => push("error", "Registration failed")
-  });
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-100 to-white px-4 py-10">
-      <div className="mx-auto max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-card">
-        <h1 className="text-2xl font-bold">Register</h1>
-        <p className="mt-1 text-sm text-slate-500">Create a new citizen account.</p>
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit((values) => mutation.mutate(values))}>
-          <Field label="Name" error={errors.name?.message}>
-            <input {...register("name")} className="input" />
-          </Field>
-          <Field label="Email" error={errors.email?.message}>
-            <input {...register("email")} className="input" />
-          </Field>
-          <Field label="Password" error={errors.password?.message}>
-            <input type="password" {...register("password")} className="input" />
-          </Field>
-          <Field label="Confirm Password" error={errors.confirmPassword?.message}>
-            <input type="password" {...register("confirmPassword")} className="input" />
-          </Field>
+    return (
+      <div className="min-h-screen bg-[#f5f5f5] px-6 py-6 lg:px-10">
+        <div className="relative min-h-[calc(100vh-3rem)] rounded-[24px] border border-black bg-[#f5f5f5]">
           <button
-            type="submit"
-            disabled={mutation.isPending}
-            className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            type="button"
+            onClick={() => navigate(-1)}
+            className="absolute left-8 top-8 flex h-10 w-10 items-center justify-center rounded-full text-black transition hover:bg-black/5"
           >
-            {mutation.isPending ? "Creating..." : "Create account"}
+            <ArrowLeft size={24} />
           </button>
-        </form>
-        <p className="mt-4 text-sm text-slate-600">
-          Already have an account?{" "}
-          <Link to="/login" className="font-medium text-emerald-700 hover:underline">
-            Login
-          </Link>
-        </p>
-      </div>
-    </div>
-  );
-}
+          <div className="grid min-h-[calc(100vh-3rem)] grid-cols-1 lg:grid-cols-2">
+            <div className="hidden items-center justify-center px-10 lg:flex">
+              <img src={city} alt="city" className="max-h-[620px] w-full max-w-[560px] object-contain" />
+            </div>
+            <div className="flex items-center justify-center px-6 py-20 lg:px-16">
+              <div className="w-full-max-[420px]">
+                <h1 className="text-center text-4xl font-extrabold text-black lg:text-[52px]">
+                  SIGN UP
+                </h1>
+                
+                <form
+                  className="mt-8 space-y-4"
+                  onSubmit={handleSubmit((values) => mutation.mutate(values))}
+                >
+                  <div>
+                    <div className="flex items-center gap-3 rounded-[18px] bg-[#F0EDFFCC] px-5 py-4">
+                      <User size={20} className="text-black/70" />
+                      <input 
+                        {...register("name")}
+                        placeholder="Username"
+                        className="w-full bg-transparent text-[18px] text-black outline-none placeholder:text-black/70"
+                      />
+                    </div>
+                    {errors.name && (
+                      <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+                    )}
+                  </div>
 
-function Field({
-  label,
-  error,
-  children
-}: {
-  label: string;
-  error?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <label className="mb-1 block text-sm font-medium">{label}</label>
-      {children}
-      {error && <p className="mt-1 text-xs text-rose-600">{error}</p>}
-    </div>
-  );
-}
+                  <div>
+                    <div className="flex items-center gap-3 rounded-[18px] bg-[#F0EDFFCC] px-5 py-4">
+                      <Mail size={20} className="text-black/70" />
+                      <input
+                        {...register("email")}
+                        type="email"
+                        placeholder="Email"
+                        className="w-full bg-transparent text-[18px] text-black outline-none placeholder:text-black/70"
+                      />
+                    </div>
+                    {errors.email && (
+                      <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-3 rounded-[18px] bg-[#F0EDFFCC] px-5 py-4">
+                      <Lock size={20} className="text-black/70" />
+                      <input
+                        {...register("password")}
+                        type="password"
+                        placeholder="Password"
+                        className="w-full bg-transparent text-[18px] text-black outline-none placeholder:text-black/70"
+                      />
+                    </div>
+                    {errors.password && (
+                      <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-3 rounded-[18px] bg-[#F0EDFFCC] px-5 py-4">
+                      <Lock size={20} className="text-black/70" />
+                      <input
+                        {...register("confirmPassword")}
+                        type="password"
+                        placeholder="Confirm Password"
+                        className="w-full bg-transparent text-[18px] text-black outline-none placeholder:text-black/70"
+                      />
+                    </div>
+                    {errors.confirmPassword && (
+                      <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
+                    )}
+                  </div>
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={mutation.isPending}
+                      className="mx-auto block min-w-[220px] rounded-full bg-black px-10 py-4 text-lg font-bold uppercase tracking-[0.18em] text-white transition hover:opacity-90 disabled:opacity-60"
+                    >
+                      {mutation.isPending ? "Creating...": "SING UP"}
+                    </button>
+                  </div>
+                </form>
+                
+                <div className="mt-8">
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-black/10" />
+                    </div>
+                    <p className="relative text-center text-[16px] font-semibold text-black/85">
+                      <span className="bg-[#f5f5f5] px-3">
+                        Already have an account?{" "}
+                        <Link to="/login" className="font-bold hover:underline">Login</Link>
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }

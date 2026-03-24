@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("./loadEnv");
 
 ["log", "info", "warn", "error"].forEach((method) => {
   const original = console[method].bind(console);

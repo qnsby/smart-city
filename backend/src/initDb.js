@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("./loadEnv");
 const { query, pool } = require("./db");
 
 async function init() {
@@ -6,10 +6,32 @@ async function init() {
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL UNIQUE,
+      email TEXT NOT NULL UNIQUE,
       role TEXT NOT NULL,
       department_id TEXT,
       password_hash TEXT NOT NULL
     );
+  `);
+
+  await query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS email TEXT;
+  `);
+
+  await query(`
+    UPDATE users
+    SET email = CONCAT(id, '@local.invalid')
+    WHERE email IS NULL OR TRIM(email) = '';
+  `);
+
+  await query(`
+    ALTER TABLE users
+    ALTER COLUMN email SET NOT NULL;
+  `);
+
+  await query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_lower_unique
+    ON users (LOWER(email));
   `);
 
   await query(`
@@ -24,8 +46,34 @@ async function init() {
       h3_index TEXT NOT NULL,
       created_by TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       assigned_team TEXT,
+      photo_path TEXT,
+      photo_mime TEXT,
+      photo_size INTEGER,
       created_at TIMESTAMPTZ NOT NULL
     );
+  `);
+
+  await query(`
+    ALTER TABLE tickets
+    ADD COLUMN IF NOT EXISTS photo_mime TEXT;
+  `);
+
+  await query(`
+    DO $$
+    BEGIN
+      IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = 'tickets' AND column_name = 'photo_mine'
+      ) THEN
+        UPDATE tickets
+        SET photo_mime = COALESCE(photo_mime, photo_mine)
+        WHERE photo_mime IS NULL AND photo_mine IS NOT NULL;
+
+        ALTER TABLE tickets
+        DROP COLUMN photo_mine;
+      END IF;
+    END $$;
   `);
 
   await query(`

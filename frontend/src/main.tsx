@@ -9,13 +9,19 @@ import { ProtectedRoute } from "./auth/ProtectedRoute";
 import { AppShell } from "./components/layout/AppShell";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
-import { MapPage } from "./pages/MapPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { HomePage } from "./pages/HomePage";
 import { IssueDetailsPage } from "./pages/IssueDetailsPage";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage";
 import { AdminIssuesPage } from "./pages/AdminIssuesPage";
 import { AdminUsersPage } from "./pages/AdminUsersPage";
 import { USE_MSW } from "./utils/constants";
 import "./index.css";
+import { ReportIssuePage } from "./pages/ReportIssue";
+import { MyReportPage } from "./pages/MyReportsPage";
+
+
+
 
 async function enableMocks() {
   if (!USE_MSW) return;
@@ -24,6 +30,7 @@ async function enableMocks() {
 }
 
 const router = createBrowserRouter([
+  { path: "/", element:<HomePage />},
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
   {
@@ -32,9 +39,10 @@ const router = createBrowserRouter([
       {
         element: <AppShell />,
         children: [
-          { path: "/", element: <Navigate to="/map" replace /> },
-          { path: "/map", element: <MapPage /> },
-          { path: "/issue/:id", element: <IssueDetailsPage /> }
+          { path: "/dashboard", element: <DashboardPage /> },
+          { path: "/issue/:id", element: <IssueDetailsPage /> },
+          { path: "/reportIssue", element: <ReportIssuePage />},
+          { path: "/myReport", element: <MyReportPage />}
         ]
       }
     ]
@@ -52,7 +60,7 @@ const router = createBrowserRouter([
       }
     ]
   },
-  { path: "*", element: <Navigate to="/map" replace /> }
+  { path: "*", element: <Navigate to="/" replace /> }
 ]);
 
 function renderApp() {

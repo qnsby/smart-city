@@ -1,55 +1,96 @@
-import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
 import { isAdminRole } from "../../utils/roles";
+import logo from "../../assets/branding/logo.svg";
+import {
+  ChevronLeft,
+  LayoutDashboard,
+  FilePlus2,
+  ClipboardList,
+  Settings,
+  Shield,
+  ListChecks,
+  Users,
+  LogOut
+} from "lucide-react";
+import { useState } from "react";
 
 export function AppShell() {
   const { user, logout } = useAuth();
-  const location = useLocation();
-  const isAdminArea = location.pathname.startsWith("/admin");
   const admin = isAdminRole(user?.role);
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-          <Link to="/map" className="text-sm font-semibold tracking-tight text-slate-900">
-            Smart City Platform
-          </Link>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-xs text-slate-500 sm:inline">
-              {user?.name} • {user?.role}
-            </span>
+    <div className="min-h-screen bg-[#eef0f3] text-slate-900">
+      <div className={`grid min-h-screen gap-4 p-4 transition-all duration-300 ${
+        collapsed ? "grid-cols-[80px_1fr]" : "grid-cols-[250px_1fr]"
+      }`}>
+        <aside className="rounded-[10px] bg-white p-4 shadow-sm">
+          <div className="flex items-start justify-between">
+            <Link to="/map">
+              <img src={logo} alt="FixMyCity logo" className="h-12 w-auto" />
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setCollapsed(!collapsed)}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-600"
+            >
+              <ChevronLeft 
+              size={16} 
+              className={`transition-transform ${collapsed ? "rotate-180" : ""}`}
+              />
+            </button>
+          </div>
+
+          <nav className="mt-10 space-y-2">
+            <NavItem to="/dashboard" label="Dashboard" icon={<LayoutDashboard size={18}/>} collapsed={collapsed}/>
+            <NavItem to="/reportIssue" label="Report Issue" icon={<FilePlus2 size={18} />} collapsed={collapsed}/>
+            <NavItem to="/myReport" label="My Reports" icon={<ClipboardList size={18} />} collapsed={collapsed}/>
+            <NavItem to="/dashboard" label="Profile / Settings" icon={<Settings size={18} />} collapsed={collapsed}/>
+
+            {admin ? (
+              <NavItem
+                to="/admin/dashboard"
+                label="Admin Dashboard"
+                icon={<Shield size={18} />}
+                collapsed={collapsed}
+              />
+            ) : null}
+
+            {admin ? (
+              <NavItem
+                to="/admin/issues"
+                label="Admin Issues"
+                icon={<ListChecks size={18} />}
+                collapsed={collapsed}
+              />
+            ) : null}
+
+            {admin ? (
+              <NavItem to="/admin/users" label="Users" icon={<Users size={18} />} collapsed={collapsed}/>
+            ) : null}
+          </nav>
+
+          <div className="mt-6 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
+            <div className="font-medium text-slate-700">Signed in as</div>
+            <div className="mt-1">
+              {user?.name}
+              <br />
+              {user?.role}
+            </div>
+
             <button
               onClick={logout}
-              className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-3 py-2 text-sm hover:bg-slate-100"
             >
+              <LogOut size={16} />
               Logout
             </button>
           </div>
-        </div>
-      </header>
-
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 px-4 py-4 lg:grid-cols-[240px_1fr]">
-        <aside className="rounded-2xl border border-slate-200 bg-white p-3 shadow-card">
-          <nav className="space-y-1">
-            <NavItem to="/map" label="Map & Reporting" />
-            {admin ? <NavItem to="/admin/dashboard" label="Admin Dashboard" /> : null}
-            {admin ? <NavItem to="/admin/issues" label="Admin Issues" /> : null}
-            {admin ? <NavItem to="/admin/users" label="Users" /> : null}
-          </nav>
-          <div className="mt-4 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
-            <div className="font-medium text-slate-700">Role access</div>
-            <div className="mt-1">
-              Citizen: map/reporting only
-              <br />
-              Dept Admin: issues + analytics + users
-              <br />
-              University Admin: full admin
-            </div>
-          </div>
         </aside>
 
-        <main className={isAdminArea ? "min-w-0" : "min-w-0"}>
+        <main className="min-w-0">
           <Outlet />
         </main>
       </div>
@@ -57,17 +98,32 @@ export function AppShell() {
   );
 }
 
-function NavItem({ to, label }: { to: string; label: string }) {
+function NavItem({
+  to,
+  label,
+  icon,
+  collapsed
+}: {
+  to: string;
+  label: string;
+  icon: React.ReactNode;
+  collapsed:boolean;
+}) {
   return (
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `block rounded-xl px-3 py-2 text-sm ${
-          isActive ? "bg-emerald-50 text-emerald-700" : "text-slate-600 hover:bg-slate-50"
+        `flex items-center gap-3 rounded-xl px-3 py-3 text-[16px] transition ${
+          isActive
+            ? "bg-slate-100 font-medium text-slate-900"
+            : "text-slate-600 hover:bg-slate-50"
         }`
       }
     >
-      {label}
+      <span className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-slate-200 bg-white shadow-sm">
+        {icon}
+      </span>
+      {!collapsed && <span>{label}</span>}
     </NavLink>
   );
 }

@@ -14,6 +14,7 @@ interface BackendTicket {
   created_at: string;
   created_by: string;
   assigned_team: string | null;
+  photo_url?: string | null;
 }
 
 interface BackendTicketListResponse {
@@ -66,7 +67,8 @@ function mapTicketToIssue(ticket: BackendTicket): Issue {
     created_at: ticket.created_at,
     updated_at: ticket.created_at,
     created_by: ticket.created_by,
-    assigned_department_id: ticket.assigned_team ?? null
+    assigned_department_id: ticket.assigned_team ?? null,
+    photo_url: ticket.photo_url ?? null
   };
 }
 
@@ -157,15 +159,24 @@ export async function getIssueApi(id: string) {
 }
 
 export async function createIssueApi(payload: CreateIssuePayload) {
-  const { data } = await apiClient.post<BackendTicket>("/tickets/create", {
-    title: payload.title,
-    description: payload.description,
-    category: payload.category,
-    latitude: payload.lat,
-    longitude: payload.lng
+  const formData = new FormData();
+  formData.append("title", payload.title);
+  formData.append("description", payload.description);
+  formData.append("category", payload.category);
+  formData.append("latitude", String(payload.lat));
+  formData.append("longitude", String(payload.lng));
+
+  if(payload.photo) {
+    formData.append("photo",payload.photo);
+  }
+
+  const { data } = await apiClient.post<BackendTicket>("/tickets/create",formData,{
+    headers: {
+      "Content-Type": "multipart/form-data"
+    }
   });
 
-  return mapTicketToIssue(data);
+  return mapTicketToIssue(data)
 }
 
 export async function updateIssueStatusApi(id: string, status: Issue["status"]) {

@@ -1,4 +1,4 @@
-# Smart City Platform (Express + Supabase Postgres + React + H3)
+# Smart City Platform
 
 Smart City is a full-stack incident management app:
 - citizens can report issues on the map
@@ -43,7 +43,7 @@ Frontend role mapping:
 
 ## Environment
 
-Create `backend/.env`:
+Create one shared root `.env`:
 
 ```env
 PORT=3000
@@ -51,17 +51,16 @@ JWT_SECRET=change_me
 H3_RESOLUTION=9
 SUPABASE_DB_URL=postgresql://postgres.<project_ref>:<password>@<pooler-host>:6543/postgres
 SUPABASE_SSL=true
+SUPABASE_URL=https://<project_ref>.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
+SUPABASE_STORAGE_BUCKET=issue-photos
 CORS_ORIGIN=http://localhost:5173
-```
-
-Create `frontend/.env`:
-
-```env
 VITE_API_URL=http://localhost:3000
 VITE_USE_MSW=false
 ```
 
 Note:
+- Backend and frontend now both read variables from the root `.env`.
 - For Supabase pooler use port `6543`.
 - If password has special chars (`@`, `:`, `/`, `#`), URL-encode it.
 
