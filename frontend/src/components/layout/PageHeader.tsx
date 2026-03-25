@@ -1,0 +1,61 @@
+import type { ReactNode } from "react";
+import { Bell, Search, User } from "lucide-react";
+import { useAuth } from "../../auth/AuthProvider";
+
+interface PageHeaderProps {
+  title: string;
+  subtitle?: string;
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+  searchPlaceholder?: string;
+  rightSlot?: ReactNode;
+}
+
+export function PageHeader({
+  title,
+  subtitle,
+  searchValue,
+  onSearchChange,
+  searchPlaceholder = "Search",
+  rightSlot
+}: PageHeaderProps) {
+  const { user } = useAuth();
+  const showSearch = typeof searchValue === "string" && typeof onSearchChange === "function";
+
+  return (
+    <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+      <div>
+        <h1 className="text-[34px] font-extrabold leading-none text-[#222]">{title}</h1>
+        {subtitle ? <p className="mt-2 text-[18px] text-[#3d3d3d]">{subtitle}</p> : null}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-end gap-4">
+        {showSearch ? (
+          <div className="flex h-[54px] w-[560px] max-w-full items-center rounded-[10px] bg-white px-5 shadow-sm">
+            <Search size={20} className="mr-3 text-slate-500" />
+            <input
+              value={searchValue}
+              onChange={(e) => onSearchChange(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="w-full bg-transparent text-[18px] outline-none placeholder:text-slate-500"
+            />
+          </div>
+        ) : null}
+
+        {rightSlot}
+
+        <button
+          type="button"
+          aria-label="Notifications"
+          className="flex h-[54px] w-[54px] items-center justify-center rounded-[10px] bg-white text-slate-600 shadow-sm"
+        >
+          <Bell size={20} />
+        </button>
+
+        <div className="flex h-[54px] min-w-[54px] items-center justify-center rounded-full bg-slate-300 px-3 text-slate-700 shadow-sm">
+          <User size={22} />
+        </div>
+      </div>
+    </div>
+  );
+}

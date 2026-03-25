@@ -6,8 +6,10 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon src/app.js",
-    "init:db": "node src/initDb.js",
+    "init:db": "prisma db push && node src/initDb.js",
+    "postinstall": "prisma generate",
     "seed": "node src/seed.js",
+    "prisma:generate": "prisma generate",
     "start": "node src/app.js"
   },
   "repository": {
@@ -22,6 +24,7 @@
   },
   "homepage": "https://github.com/qnsby/smart-city#readme",
   "dependencies": {
+    "@prisma/client": "^6.5.0",
     "@supabase/supabase-js": "^2.49.4",
     "multer": "^1.4.5-lts.2",
     "bcryptjs": "^3.0.3",
@@ -29,12 +32,12 @@
     "express": "^5.2.1",
     "h3-js": "^4.4.0",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.16.3",
     "uui": "^1.0.7",
     "uuid": "^13.0.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "prisma": "^6.5.0"
   }
 }

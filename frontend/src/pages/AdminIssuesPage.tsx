@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listIssuesApi, updateIssueStatusApi } from "../api/issues";
+import { PageHeader } from "../components/layout/PageHeader";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
 import { StatusBadge } from "../components/ui/StatusBadge";
@@ -50,10 +51,15 @@ export function AdminIssuesPage() {
 
   return (
     <div className="space-y-4">
+      <PageHeader
+        title="Workflow Management"
+        subtitle="Search issues, filter queues and update statuses from one place."
+      />
+
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-lg font-semibold">Workflow Management</h1>
+            <h2 className="text-lg font-semibold">Filters</h2>
             <p className="text-sm text-slate-500">
               Filter issues and update status with optimistic UI and rollback.
             </p>

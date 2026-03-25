@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PageHeader } from "../components/layout/PageHeader";
 import { listUsersApi, updateUserApi } from "../api/admin";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -33,8 +34,13 @@ export function AdminUsersPage() {
 
   return (
     <div className="space-y-4">
+      <PageHeader
+        title="User Management"
+        subtitle="Review users, update roles and keep department access aligned."
+      />
+
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
-        <h1 className="text-lg font-semibold">User Management</h1>
+        <h2 className="text-lg font-semibold">User Controls</h2>
         <p className="text-sm text-slate-500">
           Admin-only list of users with role and department editing.
         </p>

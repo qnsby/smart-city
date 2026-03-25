@@ -1,26 +1,48 @@
 require("./loadEnv");
 const bcrypt = require("bcryptjs");
-const { v4: uuid } = require("uuid");
-const { query, pool } = require("./db");
+const { prisma } = require("./prisma");
 
-async function createUser({ name, email, role, department_id, password }) {
-  const id = uuid();
-  const password_hash = bcrypt.hashSync(password, 10);
-  await query(
-    `
-      INSERT INTO users (id, name, email, role, department_id, password_hash)
-      VALUES ($1, $2, $3, $4, $5, $6)
-    `,
-    [id, name, email, role, department_id, password_hash]
-  );
-  return { id, name, email, role, department_id, password };
+async function createUser({ name, email, role, departmentCode, password }) {
+  const department = departmentCode
+    ? await prisma.department.findUnique({ where: { code: departmentCode } })
+    : null;
+
+  return prisma.user.create({
+    data: {
+      name,
+      email,
+      role,
+      passwordHash: bcrypt.hashSync(password, 10),
+      departmentId: department?.id || null
+    }
+  });
 }
 
 async function seed() {
-  await query("DELETE FROM audit_logs");
-  await query("DELETE FROM h3_aggregates");
-  await query("DELETE FROM tickets");
-  await query("DELETE FROM users");
+  const departmentsCount = await prisma.department.count();
+  const categoriesCount = await prisma.ticketCategory.count();
+  if (!departmentsCount || !categoriesCount) {
+    throw new Error("Reference data missing. Run `npm run init:db` first.");
+  }
+
+  await prisma.ticketComment.deleteMany();
+  await prisma.ticketAttachment.deleteMany();
+  await prisma.ticketStatusHistory.deleteMany();
+  await prisma.auditLog.deleteMany();
+  await prisma.h3Aggregate.deleteMany();
+  await prisma.ticket.deleteMany();
+  await prisma.user.deleteMany({
+    where: {
+      email: {
+        in: [
+          "citizen.a@example.com",
+          "dept.admin@example.com",
+          "supervisor@example.com",
+          "superadmin@example.com"
+        ]
+      }
+    }
+  });
 
   const users = [];
   users.push(
@@ -28,7 +50,7 @@ async function seed() {
       name: "Citizen A",
       email: "citizen.a@example.com",
       role: "CITIZEN",
-      department_id: null,
+      departmentCode: null,
       password: "pass123"
     })
   );
@@ -37,7 +59,7 @@ async function seed() {
       name: "Dept Admin",
       email: "dept.admin@example.com",
       role: "DEPT_ADMIN",
-      department_id: "WATER",
+      departmentCode: "WATER",
       password: "pass123"
     })
   );
@@ -46,7 +68,7 @@ async function seed() {
       name: "Supervisor",
       email: "supervisor@example.com",
       role: "SUPERVISOR",
-      department_id: null,
+      departmentCode: null,
       password: "pass123"
     })
   );
@@ -55,19 +77,18 @@ async function seed() {
       name: "superadmin",
       email: "superadmin@example.com",
       role: "SUPERADMIN",
-      department_id: null,
+      departmentCode: null,
       password: "superadmin"
     })
   );
 
   console.log("Seed done. Demo accounts:");
   console.table(
-    users.map((user) => ({
+    users.map((user, index) => ({
       name: user.name,
       email: user.email,
       role: user.role,
-      department_id: user.department_id,
-      password: user.password
+      password: index === 3 ? "superadmin" : "pass123"
     }))
   );
 }
@@ -78,5 +99,5 @@ seed()
     process.exitCode = 1;
   })
   .finally(async () => {
-    await pool.end();
+    await prisma.$disconnect();
   });

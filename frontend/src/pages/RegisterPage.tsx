@@ -44,7 +44,7 @@ const schema = z
         }),
       onSuccess: () => {
         push("success", "Account created");
-        navigate("/map", {replace: true});
+        navigate("/dashboard", { replace: true });
       },
       onError: () => push("error", "Register failed")
     });
@@ -137,7 +137,7 @@ const schema = z
                       disabled={mutation.isPending}
                       className="mx-auto block min-w-[220px] rounded-full bg-black px-10 py-4 text-lg font-bold uppercase tracking-[0.18em] text-white transition hover:opacity-90 disabled:opacity-60"
                     >
-                      {mutation.isPending ? "Creating...": "SING UP"}
+                      {mutation.isPending ? "Creating...": "SIGN UP"}
                     </button>
                   </div>
                 </form>

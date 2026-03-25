@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { Bell, Search, ChevronLeft, LayoutDashboard, FileText, ClipboardList, Settings, Circle } from "lucide-react";
+import { Circle } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listIssuesApi } from "../api/issues";
 import { useAuth } from "../auth/AuthProvider";
+import { PageHeader } from "../components/layout/PageHeader";
 import type { Issue } from "../types";
 
 const PAGE_LIMIT = 8;
@@ -32,30 +33,12 @@ export function MyReportPage() {
 
     return (
         <div className="space-y-8">
-            <div className="flex flex-col gap-4 xl-flex-row xl:items-start xl:justify-between">
-                <div> 
-                    <h1 className="text-[34px] font-extrabold leading-none text-[#222]">My Reports</h1>
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <div className="flex h-[54px] w-[560px] max-w-full items-center rounded-[10px] bg-white px-5 shadow-sm">
-                        <Search size={18} className="mr-3 text-slate-500" />
-                        <input 
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search"
-                            className="w-full bg-transparent text-[18px] outline-none placeholder:text-slate-500"
-                        />
-                    </div>
-                    <button className="flex h-[54px] w-[54px] items-center justify-center rounded-[10px] bg-white text-xl shadow-sm">
-                        <Bell size={18} />
-                    </button>
-
-                    <div className="flex h-[54px] w-[54px] items-center justify-center rounded-full bg-slate-300 text-sm font-bold shadow-sm">
-                        {user?.name?.[0] ?? "U"}
-                    </div>
-                </div>
-            </div>
+            <PageHeader
+                title="My Reports"
+                subtitle="Browse your submitted city issues and check their progress."
+                searchValue={search}
+                onSearchChange={setSearch}
+            />
             {query.isLoading ? (
                 <p className="text-[18px] text-slate-500">Loading...</p>
             ) : reports.length===0 ? (

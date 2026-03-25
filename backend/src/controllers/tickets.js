@@ -1,35 +1,84 @@
-const { v4: uuid } = require("uuid");
 const { latLngToCell } = require("h3-js");
-const { query } = require("../db");
+const { prisma } = require("../prisma");
 const { bus } = require("../events/bus");
 const { uploadTicketPhoto, createSignedPhotoUrl } = require("../lib/supabase");
 
 const resolution = Number(process.env.H3_RESOLUTION || 9);
+const allowedStatuses = ["NEW", "IN_PROGRESS", "DONE", "REJECTED"];
+const categoryAliases = {
+  ROAD: "road",
+  WATER: "water",
+  LIGHT: "lighting",
+  LIGHTING: "lighting",
+  TRASH: "waste",
+  WASTE: "waste",
+  SAFETY: "safety",
+  OTHER: "other"
+};
+
+const ticketInclude = {
+  category: true,
+  assignedDepartment: true,
+  attachments: {
+    orderBy: { createdAt: "asc" },
+    take: 1
+  },
+  comments: {
+    include: {
+      author: {
+        select: { id: true, name: true }
+      }
+    },
+    orderBy: { createdAt: "asc" }
+  }
+};
 
 async function audit(userId, action, entityType, entityId, metaObj) {
-  await query(
-    `
-      INSERT INTO audit_logs(id, user_id, action, entity_type, entity_id, timestamp, meta)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-    `,
-    [
-      uuid(),
+  await prisma.auditLog.create({
+    data: {
       userId,
       action,
       entityType,
       entityId,
-      new Date().toISOString(),
-      metaObj ? JSON.stringify(metaObj) : null
-    ]
-  );
+      meta: metaObj || undefined
+    }
+  });
 }
 
-async function attachPhotoUrl(ticket) {
+async function serializeTicket(ticket) {
   if (!ticket) return ticket;
 
+  const firstAttachment = ticket.attachments?.[0] || null;
+  const photoUrl = firstAttachment ? await createSignedPhotoUrl(firstAttachment.storagePath) : null;
+  const categoryCode = ticket.category?.code || null;
+  const category = categoryAliases[categoryCode] || String(categoryCode || "").toLowerCase() || null;
+  const assignedDepartmentCode = ticket.assignedDepartment?.code || null;
+
   return {
-    ...ticket,
-    photo_url: ticket.photo_path ? await createSignedPhotoUrl(ticket.photo_path) : null
+    id: ticket.id,
+    title: ticket.title,
+    description: ticket.description,
+    category,
+    status: ticket.status,
+    latitude: ticket.latitude,
+    longitude: ticket.longitude,
+    h3_index: ticket.h3Index,
+    created_by: ticket.createdById,
+    assigned_department_id: ticket.assignedDepartmentId,
+    assigned_department_code: assignedDepartmentCode,
+    assigned_team: assignedDepartmentCode,
+    created_at: ticket.createdAt,
+    updated_at: ticket.updatedAt,
+    resolved_at: ticket.resolvedAt,
+    photo_url: photoUrl,
+    comments: ticket.comments?.map((comment) => ({
+      id: comment.id,
+      author: comment.author?.name || null,
+      author_user_id: comment.authorUserId,
+      message: comment.message,
+      created_at: comment.createdAt,
+      updated_at: comment.updatedAt
+    }))
   };
 }
 
@@ -45,159 +94,232 @@ function warn(req, message, extra) {
 const ticketsController = {
   async getAllTickets(req, res) {
     const h3 = req.query.h3 ? String(req.query.h3) : null;
+    const where = {};
 
-    const result = h3
-      ? await query("SELECT * FROM tickets WHERE h3_index=$1 ORDER BY created_at DESC", [h3])
-      : await query("SELECT * FROM tickets ORDER BY created_at DESC");
+    if (h3) where.h3Index = h3;
+    if (req.user.role === "CITIZEN") where.createdById = req.user.id;
 
-    const u = req.user;
-    const filtered = result.rows.filter((ticket) => {
-      if (u.role === "CITIZEN") return ticket.created_by === u.id;
-      return true
+    const items = await prisma.ticket.findMany({
+      where,
+      include: ticketInclude,
+      orderBy: { createdAt: "desc" }
     });
-    const items = await Promise.all(filtered.map(attachPhotoUrl));
-    return res.json({ count: items.length, items })
+
+    return res.json({
+      count: items.length,
+      items: await Promise.all(items.map(serializeTicket))
+    });
   },
 
   async getTicketById(req, res) {
-    const result = await query("SELECT * FROM tickets WHERE id=$1", [req.params.id]);
-    const ticket = result.rows[0];
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: req.params.id },
+      include: ticketInclude
+    });
     if (!ticket) {
       warn(req, "getTicketById not found", { ticketId: req.params.id });
       return res.status(404).json({ error: "Not found" });
     }
 
-    if (req.user.role === "CITIZEN" && ticket.created_by !== req.user.id) {
+    if (req.user.role === "CITIZEN" && ticket.createdById !== req.user.id) {
       warn(req, "getTicketById forbidden ownership", { ticketId: ticket.id });
       return res.status(403).json({ error: "Forbidden (ownership)" });
     }
 
-    return res.json(await attachPhotoUrl(ticket));
+    return res.json(await serializeTicket(ticket));
   },
 
   async createTicket(req, res) {
     const title = req.body?.title;
-    const description = req.body?.desctiption;
-    const category = req.body?.category;
+    const description = req.body?.description ?? req.body?.desctiption;
+    const requestedCategory = String(req.body?.category || "").trim().toUpperCase();
+    const categoryCode =
+      requestedCategory === "LIGHTING"
+        ? "LIGHT"
+        : requestedCategory === "WASTE"
+          ? "TRASH"
+          : requestedCategory;
     const latitude = Number(req.body?.latitude);
     const longitude = Number(req.body?.longitude);
 
-    if (!title || !category || Number.isNaN(latitude) || Number.isNaN(longitude)) {
+    if (!title || !categoryCode || Number.isNaN(latitude) || Number.isNaN(longitude)) {
       warn(req, "createTicket validation failed", { body: req.body || null });
       return res.status(400).json({ error: "title, category, latitude(number), longitude(number) required" });
     }
 
-    const h3_index = latLngToCell(latitude, longitude, resolution);
-    const id = uuid();
-    const created_at = new Date().toISOString();
-
-    let photo_path = null;
-    let photo_mime = null;
-    let photo_size = null;
-
-    if (req.file) {
-      photo_path = await uploadTicketPhoto({ ticketId: id, file: req.file });
-      photo_mime = req.file.mimetype;
-      photo_size = req.file.size;
+    const category = await prisma.ticketCategory.findUnique({
+      where: { code: categoryCode },
+      select: { id: true, code: true }
+    });
+    if (!category) {
+      return res.status(400).json({ error: "Unknown category" });
     }
 
-    await query(
-      `
-        INSERT INTO tickets(
-          id, title, description, category, status, latitude, longitude, h3_index,
-          created_by, assigned_team, photo_path, photo_mime, photo_size, created_at
-        )
-        VALUES ($1,$2,$3,$4, 'NEW', $5,$6,$7,$8,NULL,$9,$10,$11,$12)
-      `,
-      [
-        id,
-        String(title),
-        description ? String(description) : null,
-        String(category).toUpperCase(),
+    const h3Index = latLngToCell(latitude, longitude, resolution);
+
+    const created = await prisma.ticket.create({
+      data: {
+        title: String(title),
+        description: description ? String(description) : null,
+        categoryId: category.id,
+        status: "NEW",
         latitude,
         longitude,
-        h3_index,
-        req.user.id,
-        photo_path,
-        photo_mime,
-        photo_size,
-        created_at
-      ]
-    );
-
-    await audit(req.user.id, "TICKET_CREATED", "TICKET", id, {
-      category,
-      h3_index,
-      has_photo: Boolean(photo_path)
+        h3Index,
+        createdById: req.user.id
+      },
+      include: ticketInclude
     });
 
-    bus.emit("ticket_created", { tickedId: id, h3_index, category: String(category).toUpperCase() });
+    if (req.file) {
+      const storagePath = await uploadTicketPhoto({ ticketId: created.id, file: req.file });
+      await prisma.ticketAttachment.create({
+        data: {
+          ticketId: created.id,
+          storagePath,
+          mimeType: req.file.mimetype,
+          size: req.file.size,
+          uploadedById: req.user.id
+        }
+      });
+    }
 
-    const created = await query("SELECT * FROM tickets WHERE id=$1", [id]);
-    return res.status(201).json(await attachPhotoUrl(created.rows[0]));
+    await prisma.ticketStatusHistory.create({
+      data: {
+        ticketId: created.id,
+        fromStatus: null,
+        toStatus: "NEW",
+        changedById: req.user.id,
+        comment: "Ticket created"
+      }
+    });
+
+    await audit(req.user.id, "TICKET_CREATED", "TICKET", created.id, {
+      category: category.code,
+      h3_index: h3Index,
+      has_photo: Boolean(req.file)
+    });
+
+    bus.emit("ticket_created", { ticketId: created.id, h3_index: h3Index, category: category.code });
+
+    const withAttachment = await prisma.ticket.findUnique({
+      where: { id: created.id },
+      include: ticketInclude
+    });
+
+    return res.status(201).json(await serializeTicket(withAttachment));
   },
 
   async updateTicketStatus(req, res) {
-    const { status } = req.body || {};
-    const allowed = ["NEW", "IN_PROGRESS", "DONE", "REJECTED"];
-    if (!allowed.includes(status)) {
+    const { status, comment } = req.body || {};
+    if (!allowedStatuses.includes(status)) {
       warn(req, "updateTicketStatus invalid status", { status });
       return res.status(400).json({ error: "Invalid status" });
     }
 
-    const currentResult = await query("SELECT * FROM tickets WHERE id=$1", [req.params.id]);
-    const ticket = currentResult.rows[0];
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: req.params.id },
+      select: { id: true, status: true }
+    });
     if (!ticket) {
       warn(req, "updateTicketStatus not found", { ticketId: req.params.id });
       return res.status(404).json({ error: "Not found" });
     }
 
-    await query("UPDATE tickets SET status=$1 WHERE id=$2", [status, req.params.id]);
-    await audit(req.user.id, "STATUS_UPDATED", "TICKET", req.params.id, {
-      from: ticket.status,
-      to: status
-    });
+    await prisma.$transaction([
+      prisma.ticket.update({
+        where: { id: req.params.id },
+        data: {
+          status,
+          resolvedAt: status === "DONE" ? new Date() : null
+        }
+      }),
+      prisma.ticketStatusHistory.create({
+        data: {
+          ticketId: req.params.id,
+          fromStatus: ticket.status,
+          toStatus: status,
+          changedById: req.user.id,
+          comment: comment ? String(comment) : null
+        }
+      }),
+      prisma.auditLog.create({
+        data: {
+          userId: req.user.id,
+          action: "STATUS_UPDATED",
+          entityType: "TICKET",
+          entityId: req.params.id,
+          meta: {
+            from: ticket.status,
+            to: status
+          }
+        }
+      })
+    ]);
 
-    const updated = await query("SELECT * FROM tickets WHERE id=$1", [req.params.id]);
-    return res.json(updated.rows[0]);
+    const updated = await prisma.ticket.findUnique({
+      where: { id: req.params.id },
+      include: ticketInclude
+    });
+    return res.json(await serializeTicket(updated));
   },
 
   async deleteTicket(req, res) {
-    const currentResult = await query("SELECT id FROM tickets WHERE id=$1", [req.params.id]);
-    if (!currentResult.rows[0]) {
+    const current = await prisma.ticket.findUnique({
+      where: { id: req.params.id },
+      select: { id: true }
+    });
+    if (!current) {
       warn(req, "deleteTicket not found", { ticketId: req.params.id });
       return res.status(404).json({ error: "Not found" });
     }
 
-    await query("DELETE FROM tickets WHERE id=$1", [req.params.id]);
+    await prisma.ticket.delete({ where: { id: req.params.id } });
     await audit(req.user.id, "TICKET_DELETED", "TICKET", req.params.id, null);
     return res.json({ message: "Deleted" });
   },
 
   async getAuditLogs(req, res) {
-    const ticketResult = await query("SELECT id, created_by FROM tickets WHERE id=$1", [req.params.id]);
-    const ticket = ticketResult.rows[0];
+    const ticket = await prisma.ticket.findUnique({
+      where: { id: req.params.id },
+      select: { id: true, createdById: true }
+    });
     if (!ticket) {
       warn(req, "getAuditLogs not found", { ticketId: req.params.id });
       return res.status(404).json({ error: "Not found" });
     }
 
-    if (req.user.role === "CITIZEN" && ticket.created_by !== req.user.id) {
+    if (req.user.role === "CITIZEN" && ticket.createdById !== req.user.id) {
       warn(req, "getAuditLogs forbidden ownership", { ticketId: ticket.id });
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    const logsResult = await query(
-      `
-        SELECT id, user_id, action, entity_type, entity_id, timestamp, meta
-        FROM audit_logs
-        WHERE entity_type='TICKET' AND entity_id=$1
-        ORDER BY timestamp ASC
-      `,
-      [req.params.id]
-    );
+    const logs = await prisma.auditLog.findMany({
+      where: {
+        entityType: "TICKET",
+        entityId: req.params.id
+      },
+      include: {
+        user: {
+          select: { id: true, name: true }
+        }
+      },
+      orderBy: { timestamp: "asc" }
+    });
 
-    return res.json({ count: logsResult.rows.length, items: logsResult.rows });
+    return res.json({
+      count: logs.length,
+      items: logs.map((log) => ({
+        id: log.id,
+        user_id: log.userId,
+        actor_name: log.user?.name || null,
+        action: log.action,
+        entity_type: log.entityType,
+        entity_id: log.entityId,
+        timestamp: log.timestamp,
+        meta: log.meta ? JSON.stringify(log.meta) : null
+      }))
+    });
   }
 };
 

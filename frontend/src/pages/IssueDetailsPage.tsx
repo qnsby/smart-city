@@ -1,6 +1,8 @@
+import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { getIssueApi } from "../api/issues";
+import { PageHeader } from "../components/layout/PageHeader";
 import { StaticIssueMap } from "../components/map/IssuesMap";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
@@ -16,6 +18,33 @@ function getStatusStyles(status?: string) {
     default:
       return "bg-[#eef1f4] text-[#6b7280]";
   }
+}
+
+function humanizeStatus(status?: string) {
+  if (status === "OPEN") return "New";
+  if (status === "IN_PROGRESS") return "In Progress";
+  if (status === "RESOLVED") return "Resolved";
+  return status || "Unknown";
+}
+
+function humanizeCategory(category?: string) {
+  if (category === "road") return "Road";
+  if (category === "water") return "Water";
+  if (category === "lighting") return "Street Lighting";
+  if (category === "waste") return "Waste";
+  if (category === "safety") return "Safety";
+  if (category === "other") return "Other";
+  return "Not specified";
+}
+
+function formatReportedDate(date?: string) {
+  if (!date) return "Unknown";
+
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
 }
 
 export function IssueDetailsPage() {
@@ -48,16 +77,17 @@ export function IssueDetailsPage() {
   return (
     <div className="min-h-screen bg-[#f4f6f8] px-8 py-6">
       <div className="mx-auto max-w-[1280px]">
-        <h1 className="text-[48px] font-semibold leading-none text-[#1f1f1f]">
-          My Reports
-        </h1>
+        <PageHeader
+          title="Report Details"
+          subtitle="Review the issue timeline, evidence and location."
+        />
         <div className="mt-6 flex items-center gap-3 text-[18px] text-[#9aa0a6]">
           <span>My Reports</span>
           <span>/</span>
           <span className="text-[#3a3a3a]">{issue.title}</span>
         </div>
 
-        <div className="mt-10 flex items-center gap-8">
+        <div className="mt-10 flex items-start gap-8">
           <div className="flex-1">
             <div className="overflow-hidden rounded-[28px] border border-[#e5e7eb] bg-white">
               <div className="h-[360px] overflow-hidden rounded-[28px]">
@@ -89,51 +119,41 @@ export function IssueDetailsPage() {
           </div>
           <aside className="w-[300px] shrink-0 space-y-5">
             <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <p className="text-[14px] font-medium text-[#8b8b8b]">Status</p>
-              <div className="mt-3">
-                <span
-                  className={`inline-flex rounded-full px-4 py-2 text-[14px] font-semibold ${getStatusStyles(
-                    issue.status
-                  )}`}
-                >
-                  {issue.status ?? "Unknown"}
-                </span>
+              {/* <h2 className="text-[22px] font-semibold text-[#2a2a2a]">Issue Summary</h2> */}
+
+              <div className="mt-6 space-y-5">
+                <div>
+                  <p className="text-[14px] font-medium text-[#8b8b8b]">Status</p>
+                  <div className="mt-3">
+                    <span
+                      className={`inline-flex rounded-full px-4 py-2 text-[14px] font-semibold ${getStatusStyles(
+                        issue.status
+                      )}`}
+                    >
+                      {humanizeStatus(issue.status)}
+                    </span>
+                  </div>
+                </div>
+
+                <InfoRow label="Reported">
+                  {formatReportedDate(issue.created_at)}
+                </InfoRow>
+
+                <InfoRow label="Department">
+                  {issue.assigned_department_id ?? "Not assigned"}
+                </InfoRow>
+
+                <InfoRow label="Category">
+                  {humanizeCategory(issue.category)}
+                </InfoRow>
+
+                <div>
+                  <p className="text-[14px] font-medium text-[#8b8b8b]">Description</p>
+                  <p className="mt-3 text-[16px] leading-7 text-[#4b5563]">
+                    {issue.description || "No description provided."}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <p className="text-[14px] font-medium text-[#8b8b8b]">Category</p>
-              <p className="mt-3 text-[18px] font-semibold text-[#2a2a2a]">
-                {issue.category ?? "Not specified"}
-              </p>
-            </div>
-
-            <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <p className="text-[14px] font-medium text-[#8b8b8b]">Reported By</p>
-              <p className="mt-3 text-[18px] font-semibold text-[#2a2a2a]">
-                {issue.created_by ?? "Unknown"}
-              </p>
-            </div>
-            <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <p className="text-[14px] font-medium text-[#8b8b8b]">Created At</p>
-              <p className="mt-3 text-[18-px] font-semibold text-[#2a2a2a]">
-                {issue.created_at
-                  ? new Date(issue.created_at).toLocaleDateString()
-                  : "Unknown"
-                }
-              </p>
-            </div>
-
-            <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <p className="text-[24px] font-medium text-[#8b8b8b]">Description</p>
-              <p className="mt-3 text-[16px] leading-7 text-[#4b5563]">
-                {issue.description || "No desription provided."}
-              </p>
-            </div>
-            <div className="rounded-[24px] border border-[#e5e7eb] bg-white p-6 shadow-sm">
-              <p className="text-[14px] font-medium text-[#8b8b8b]">Coordinates</p>
-              <p className="mt-3 text-[16px] text-[#2a2a2a]">
-                {issue.lat}, {issue.lng}
-              </p>
             </div>
           </aside>
         </div>
@@ -159,6 +179,15 @@ export function IssueDetailsPage() {
             </button>
           </div>
       </div>
+    </div>
+  );
+}
+
+function InfoRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <p className="text-[14px] font-medium text-[#8b8b8b]">{label}</p>
+      <p className="mt-2 text-[18px] font-semibold text-[#2a2a2a]">{children}</p>
     </div>
   );
 }

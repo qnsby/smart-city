@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
+import { PageHeader } from "../components/layout/PageHeader";
 import { StaticIssueMap } from "../components/map/IssuesMap";
 import { useMutation } from "@tanstack/react-query";
 import { createIssueApi } from "../api/issues"
@@ -61,7 +62,7 @@ export function ReportIssuePage() {
             if (data?.display_name){
                 setLocationLabel(house ? `${road} ${house}` : road);
             } else {
-                setLocationLabel("ADdress not found");
+                setLocationLabel("Address not found");
             }
         } catch(e) {
             console.error(e)
@@ -95,11 +96,10 @@ export function ReportIssuePage() {
     return (
         <>
             <div className="space-y-6">
-                <div>
-                    <h1 className="text-[34px] font-extrabold loading-none text-[#222]">
-                        Issue Report
-                    </h1>
-                </div>
+                <PageHeader
+                    title="Issue Report"
+                    subtitle="Mark the problem on the map and send the full report to the city team."
+                />
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_370px]">
                     <div className="rounded-[28px] bg-white shadow-sm overflow-hidden">
                         <div className="relative">
@@ -224,7 +224,7 @@ export function ReportIssuePage() {
 
                             <div className="mt-14 flex flex-col items-center gap-5 sm:flex-row">
                                 <Link
-                                    to="/my-reports"
+                                    to="/myReport"
                                     className="flex h-[60px] min-w-[240px] items-center justify-center rounded-full bg-[#444A59] px-8 text-[20px] font-medium text-white transition hover:opacity-90"
                                 >
                                     View My Reports

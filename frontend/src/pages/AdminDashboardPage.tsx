@@ -15,6 +15,7 @@ import {
 } from "recharts";
 import { getAnalyticsSummaryApi, getH3AnalyticsApi } from "../api/analytics";
 import { useAuth } from "../auth/AuthProvider";
+import { PageHeader } from "../components/layout/PageHeader";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
 
@@ -49,12 +50,17 @@ export function AdminDashboardPage() {
 
   return (
     <div className="space-y-4">
+      <PageHeader
+        title="Analytics Dashboard"
+        subtitle="H3 zone distribution, status and category metrics, and resolution time trends."
+      />
+
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-lg font-semibold">Analytics Dashboard</h1>
+            <h2 className="text-lg font-semibold">Filters</h2>
             <p className="text-sm text-slate-500">
-              H3 zone distribution, status/category metrics, and resolution time trends.
+              Refine analytics by status, date range and H3 resolution.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

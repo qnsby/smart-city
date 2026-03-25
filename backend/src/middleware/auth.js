@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const { query } = require("../db");
 const { normalizeRole } = require("./rbac");
+const { prisma } = require("../prisma");
 
 async function authRequired(req, res, next) {
   const header = req.headers.authorization || "";
@@ -12,17 +12,21 @@ async function authRequired(req, res, next) {
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
-    const result = await query("SELECT id, name, email, role, department_id FROM users WHERE id=$1", [
-      payload.user_id
-    ]);
-    const user = result.rows[0];
+    const user = await prisma.user.findUnique({
+      where: { id: payload.user_id },
+      include: { department: true }
+    });
     if (!user) {
       console.warn(`[AUTH] Token user not found for ${req.method} ${req.originalUrl}`);
       return res.status(401).json({ error: "User not found" });
     }
 
     req.user = {
-      ...user,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      department_id: user.departmentId,
+      department_code: user.department?.code || null,
       role: normalizeRole(user.role)
     };
     return next();

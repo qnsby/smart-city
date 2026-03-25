@@ -7,7 +7,7 @@ Smart City is a full-stack incident management app:
 
 ## Current Stack
 
-- Backend: Node.js, Express, JWT, `pg`, `h3-js`
+- Backend: Node.js, Express, JWT, Prisma, `h3-js`
 - Database: Supabase Postgres
 - Frontend: React, Vite, TypeScript, React Query, Tailwind
 
@@ -27,8 +27,15 @@ Frontend role mapping:
 
 - JWT auth (`/auth/login`, `/auth/register`, `/auth/me`)
 - Tickets CRUD with H3 indexing
+- Prisma data model with:
+  - departments
+  - ticket categories
+  - ticket comments
+  - ticket attachments
+  - ticket status history
+  - audit logs
 - Event handler on ticket creation:
-  - auto-assign team by category
+  - auto-assign department by category
   - increment H3 aggregates
 - Analytics endpoints (`/analytics/h3`, `/analytics/top-cells`)
 - Admin users API:
@@ -74,7 +81,7 @@ npm --prefix frontend install
 
 ## Database Init
 
-Run schema creation:
+Run Prisma schema sync and bootstrap reference data:
 
 ```bash
 npm run init:db

@@ -1,4 +1,4 @@
-const { query } = require("../db");
+const { prisma } = require("../prisma");
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
@@ -7,32 +7,29 @@ function todayISO() {
 const analyticsController = {
   async getH3Analytics(req, res) {
     const date = String(req.query.date || todayISO());
-    const result = await query(
-      `
-        SELECT h3_index, ticket_count
-        FROM h3_aggregates
-        WHERE date=$1
-        ORDER BY ticket_count DESC
-        LIMIT 200
-      `,
-      [date]
-    );
-    return res.json({ date, count: result.rows.length, items: result.rows });
+    const items = await prisma.h3Aggregate.findMany({
+      where: { date },
+      orderBy: { ticketCount: "desc" },
+      take: 200
+    });
+    return res.json({
+      date,
+      count: items.length,
+      items: items.map((item) => ({ h3_index: item.h3Index, ticket_count: item.ticketCount }))
+    });
   },
 
   async getTopCells(req, res) {
     const date = String(req.query.date || todayISO());
-    const result = await query(
-      `
-        SELECT h3_index, ticket_count
-        FROM h3_aggregates
-        WHERE date=$1
-        ORDER BY ticket_count DESC
-        LIMIT 10
-      `,
-      [date]
-    );
-    return res.json({ date, items: result.rows });
+    const items = await prisma.h3Aggregate.findMany({
+      where: { date },
+      orderBy: { ticketCount: "desc" },
+      take: 10
+    });
+    return res.json({
+      date,
+      items: items.map((item) => ({ h3_index: item.h3Index, ticket_count: item.ticketCount }))
+    });
   }
 };
 

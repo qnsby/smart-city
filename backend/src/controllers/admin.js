@@ -1,21 +1,22 @@
-const { query } = require("../db");
 const { normalizeRole } = require("../middleware/rbac");
+const { prisma } = require("../prisma");
 
 const editableRoles = new Set(["CITIZEN", "DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"]);
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const adminController = {
   async listUsers(_req, res) {
-    const result = await query(
-      `
-        SELECT id, name, email, role, department_id
-        FROM users
-        ORDER BY name ASC
-      `
-    );
+    const result = await prisma.user.findMany({
+      include: { department: true },
+      orderBy: { name: "asc" }
+    });
 
-    const items = result.rows.map((user) => ({
-      ...user,
+    const items = result.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      department_id: user.departmentId,
+      department_code: user.department?.code || null,
       role: normalizeRole(user.role)
     }));
 
@@ -35,45 +36,59 @@ const adminController = {
       return res.status(400).json({ error: "Invalid email" });
     }
 
-    const currentResult = await query("SELECT id FROM users WHERE id=$1", [req.params.id]);
-    if (!currentResult.rows[0]) {
+    const currentUser = await prisma.user.findUnique({ where: { id: req.params.id } });
+    if (!currentUser) {
       return res.status(404).json({ error: "User not found" });
     }
 
     if (normalizedEmail !== undefined) {
-      const existingEmail = await query(
-        "SELECT id FROM users WHERE LOWER(email)=LOWER($1) AND id <> $2 LIMIT 1",
-        [normalizedEmail, req.params.id]
-      );
-      if (existingEmail.rows.length) {
+      const existingEmail = await prisma.user.findFirst({
+        where: {
+          email: { equals: normalizedEmail, mode: "insensitive" },
+          NOT: { id: req.params.id }
+        },
+        select: { id: true }
+      });
+      if (existingEmail) {
         return res.status(409).json({ error: "Email already exists" });
       }
     }
 
-    const updateResult = await query(
-      `
-        UPDATE users
-        SET role = COALESCE($1, role),
-            email = COALESCE($2, email),
-            department_id = CASE
-              WHEN $3::text = '__KEEP__' THEN department_id
-              ELSE $3
-            END
-        WHERE id=$4
-        RETURNING id, name, email, role, department_id
-      `,
-      [
-        nextRole,
-        normalizedEmail === undefined ? null : normalizedEmail,
-        department_id === undefined ? "__KEEP__" : department_id,
-        req.params.id
-      ]
-    );
+    let nextDepartmentId = currentUser.departmentId;
+    if (department_id !== undefined) {
+      if (department_id === null || department_id === "") {
+        nextDepartmentId = null;
+      } else {
+        const department = await prisma.department.findFirst({
+          where: {
+            OR: [{ id: String(department_id) }, { code: String(department_id).toUpperCase() }]
+          },
+          select: { id: true, code: true }
+        });
+        if (!department) {
+          return res.status(400).json({ error: "Department not found" });
+        }
+        nextDepartmentId = department.id;
+      }
+    }
 
-    const updated = updateResult.rows[0];
+    const updated = await prisma.user.update({
+      where: { id: req.params.id },
+      data: {
+        role: nextRole || undefined,
+        email: normalizedEmail,
+        departmentId: nextDepartmentId
+      },
+      include: { department: true }
+    });
+
     return res.json({
-      ...updated,
-      role: normalizeRole(updated.role)
+      id: updated.id,
+      name: updated.name,
+      email: updated.email,
+      role: normalizeRole(updated.role),
+      department_id: updated.departmentId,
+      department_code: updated.department?.code || null
     });
   }
 };

@@ -1,30 +1,32 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { v4: uuid } = require("uuid");
-const { query } = require("../db");
 const { normalizeRole } = require("../middleware/rbac");
+const { prisma } = require("../prisma");
 
 const authController = {
   async login(req, res) {
-    const { name, email, password } = req.body || {};
-    const login = String(name || email || "").trim();
+    const { login: loginInput, name, email, password } = req.body || {};
+    const login = String(loginInput || name || email || "").trim();
 
     if (!login || !password) {
       console.warn("[AUTH] Login failed: missing name or password");
       return res.status(400).json({ error: "name and password required" });
     }
 
-    const result = await query(
-      "SELECT id, name, email, role, department_id, password_hash FROM users WHERE LOWER(name)=LOWER($1) OR LOWER(email)=LOWER($1) LIMIT 1",
-      [login]
-    );
-    const user = result.rows[0];
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [{ name: { equals: login, mode: "insensitive" } }, { email: { equals: login, mode: "insensitive" } }]
+      },
+      include: {
+        department: true
+      }
+    });
     if (!user) {
       console.warn(`[AUTH] Login failed: user not found (${login})`);
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const ok = bcrypt.compareSync(password, user.password_hash);
+    const ok = bcrypt.compareSync(password, user.passwordHash);
     if (!ok) {
       console.warn(`[AUTH] Login failed: invalid password for ${login}`);
       return res.status(401).json({ error: "Invalid credentials" });
@@ -32,7 +34,7 @@ const authController = {
 
     const role = normalizeRole(user.role);
     const token = jwt.sign(
-      { user_id: user.id, role, department_id: user.department_id },
+      { user_id: user.id, role, department_id: user.departmentId },
       process.env.JWT_SECRET,
       { expiresIn: "8h" }
     );
@@ -40,7 +42,14 @@ const authController = {
     console.log(`[AUTH] Login success: ${user.name} (${role})`);
     return res.json({
       token,
-      user: { id: user.id, name: user.name, email: user.email, role, department_id: user.department_id }
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role,
+        department_id: user.departmentId,
+        department_code: user.department?.code || null
+      }
     });
   },
   async register(req, res) {
@@ -52,31 +61,38 @@ const authController = {
       return res.status(400).json({ error: "name, email and password are required" });
     }
 
-    const existing = await query("SELECT id FROM users WHERE LOWER(name)=LOWER($1) LIMIT 1", [name]);
-    if (existing.rows.length) {
+    const existing = await prisma.user.findFirst({
+      where: { name: { equals: name, mode: "insensitive" } },
+      select: { id: true }
+    });
+    if (existing) {
       console.warn(`[AUTH] Registration failed: user already exists (${name})`);
       return res.status(409).json({ error: "User already exists" });
     }
 
-    const existingEmail = await query("SELECT id FROM users WHERE LOWER(email)=LOWER($1) LIMIT 1", [
-      normalizedEmail
-    ]);
-    if (existingEmail.rows.length) {
+    const existingEmail = await prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+      select: { id: true }
+    });
+    if (existingEmail) {
       console.warn(`[AUTH] Registration failed: email already exists (${normalizedEmail})`);
       return res.status(409).json({ error: "Email already exists" });
     }
 
-    const id = uuid();
     const role = "CITIZEN";
-    const hashedPassword = bcrypt.hashSync(password, 12);
-    await query(
-      "INSERT INTO users (id, name, email, password_hash, role, department_id) VALUES ($1, $2, $3, $4, $5, $6)",
-      [id, name, normalizedEmail, hashedPassword, role, null]
-    );
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email: normalizedEmail,
+        passwordHash: bcrypt.hashSync(password, 12),
+        role,
+        departmentId: null
+      }
+    });
 
     console.log(`[AUTH] Registration success: ${name} (${role})`);
     return res.status(201).json({
-      user: { id, name, email: normalizedEmail, role, department_id: null }
+      user: { id: user.id, name, email: normalizedEmail, role, department_id: null }
     });
   },
   me(req, res) {
@@ -85,7 +101,8 @@ const authController = {
       name: req.user.name,
       email: req.user.email,
       role: req.user.role,
-      department_id: req.user.department_id
+      department_id: req.user.department_id,
+      department_code: req.user.department_code || null
     });
   }
 };
