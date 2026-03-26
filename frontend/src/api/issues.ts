@@ -12,19 +12,25 @@ interface BackendTicket {
   latitude: number;
   longitude: number;
   created_at: string;
+  updated_at: string;
   created_by: string;
-  assigned_team: string | null;
+  assigned_department_id: string | null;
+  assigned_department_code?: string | null;
   photo_url?: string | null;
 }
 
 interface BackendTicketListResponse {
   count: number;
+  page: number;
+  limit: number;
+  total: number;
   items: BackendTicket[];
 }
 
 interface BackendAuditItem {
   id: string;
   user_id: string;
+  actor_name?: string | null;
   action: string;
   timestamp: string;
   meta: string | null;
@@ -65,38 +71,12 @@ function mapTicketToIssue(ticket: BackendTicket): Issue {
     lat: ticket.latitude,
     lng: ticket.longitude,
     created_at: ticket.created_at,
-    updated_at: ticket.created_at,
+    updated_at: ticket.updated_at,
     created_by: ticket.created_by,
-    assigned_department_id: ticket.assigned_team ?? null,
+    assigned_department_id: ticket.assigned_department_id ?? null,
+    assigned_department_code: ticket.assigned_department_code ?? null,
     photo_url: ticket.photo_url ?? null
   };
-}
-
-function matchesQuery(issue: Issue, q?: string) {
-  const needle = (q || "").trim().toLowerCase();
-  if (!needle) return true;
-  return (
-    issue.title.toLowerCase().includes(needle) ||
-    issue.description.toLowerCase().includes(needle) ||
-    issue.id.toLowerCase().includes(needle)
-  );
-}
-
-function inDateRange(issue: Issue, from?: string, to?: string) {
-  const createdTs = Date.parse(issue.created_at);
-  if (Number.isNaN(createdTs)) return true;
-
-  if (from) {
-    const fromTs = Date.parse(`${from}T00:00:00`);
-    if (!Number.isNaN(fromTs) && createdTs < fromTs) return false;
-  }
-
-  if (to) {
-    const toTs = Date.parse(`${to}T23:59:59.999`);
-    if (!Number.isNaN(toTs) && createdTs > toTs) return false;
-  }
-
-  return true;
 }
 
 function safeParseMeta(meta: string | null): Record<string, unknown> | null {
@@ -113,28 +93,24 @@ function safeParseMeta(meta: string | null): Record<string, unknown> | null {
 }
 
 export async function listIssuesApi(filters: IssueFilters) {
-  const { data } = await apiClient.get<BackendTicketListResponse>("/tickets/getAll");
+  const params = new URLSearchParams();
+  if (filters.status) params.set("status", filters.status);
+  if (filters.category) params.set("category", filters.category);
+  if (filters.from) params.set("from", filters.from);
+  if (filters.to) params.set("to", filters.to);
+  if (filters.q) params.set("q", filters.q);
+  if (filters.page) params.set("page", String(filters.page));
+  if (filters.limit) params.set("limit", String(filters.limit));
 
-  const page = Math.max(1, Number(filters.page || 1));
-  const limit = Math.max(1, Number(filters.limit || 20));
-
-  let items = data.items.map(mapTicketToIssue);
-
-  if (filters.status) items = items.filter((item) => item.status === filters.status);
-  if (filters.category) items = items.filter((item) => item.category === filters.category);
-  if (filters.q) items = items.filter((item) => matchesQuery(item, filters.q));
-  if (filters.from || filters.to) {
-    items = items.filter((item) => inDateRange(item, filters.from, filters.to));
-  }
-
-  const total = items.length;
-  const start = (page - 1) * limit;
+  const { data } = await apiClient.get<BackendTicketListResponse>(
+    `/tickets/getAll${params.toString() ? `?${params.toString()}` : ""}`
+  );
 
   return {
-    items: items.slice(start, start + limit),
-    page,
-    limit,
-    total
+    items: data.items.map(mapTicketToIssue),
+    page: data.page,
+    limit: data.limit,
+    total: data.total
   } satisfies PaginatedResponse<Issue>;
 }
 
@@ -147,7 +123,7 @@ export async function getIssueApi(id: string) {
     issue.audit = audit.data.items.map((entry) => ({
       id: entry.id,
       action: entry.action,
-      actor_name: entry.user_id,
+      actor_name: entry.actor_name || entry.user_id,
       timestamp: entry.timestamp,
       meta: safeParseMeta(entry.meta)
     }));

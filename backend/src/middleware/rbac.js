@@ -1,8 +1,14 @@
 const ROLE_ALIASES = {
   citizen: "CITIZEN",
-  dept_admin: "DEPT_ADMIN",
-  departmentadmin: "DEPT_ADMIN",
-  supervisor: "SUPERVISOR",
+  operator: "OPERATOR",
+  department_admin: "DEPARTMENT_ADMIN",
+  departmentadmin: "DEPARTMENT_ADMIN",
+  dept_admin: "DEPARTMENT_ADMIN",
+  field_worker: "FIELD_WORKER",
+  fieldworker: "FIELD_WORKER",
+  city_supervisor: "CITY_SUPERVISOR",
+  citysupervisor: "CITY_SUPERVISOR",
+  supervisor: "CITY_SUPERVISOR",
   superadmin: "SUPERADMIN",
   university_admin: "SUPERADMIN"
 };
@@ -11,7 +17,7 @@ function normalizeRole(role) {
   const raw = String(role || "").trim();
   if (!raw) return "";
   const upper = raw.toUpperCase();
-  if (["CITIZEN", "DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"].includes(upper)) return upper;
+  if (["CITIZEN", "OPERATOR", "DEPARTMENT_ADMIN", "FIELD_WORKER", "CITY_SUPERVISOR", "SUPERADMIN"].includes(upper)) return upper;
   return ROLE_ALIASES[raw.toLowerCase()] || upper;
 }
 

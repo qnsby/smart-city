@@ -34,15 +34,18 @@ export async function listUsersApi() {
 export async function updateUserApi(
   id: string,
   payload: {
-    role?: "citizen" | "dept_admin" | "university_admin";
+    role?: "citizen" | "operator" | "department_admin" | "field_worker" | "city_supervisor" | "superadmin";
     department_id?: string | null;
     email?: string;
   }
 ) {
   const roleMap = {
     citizen: "CITIZEN",
-    dept_admin: "DEPT_ADMIN",
-    university_admin: "SUPERADMIN"
+    operator: "OPERATOR",
+    department_admin: "DEPARTMENT_ADMIN",
+    field_worker: "FIELD_WORKER",
+    city_supervisor: "CITY_SUPERVISOR",
+    superadmin: "SUPERADMIN"
   } as const;
 
   const body: { role?: string; department_id?: string | null; email?: string } = {};

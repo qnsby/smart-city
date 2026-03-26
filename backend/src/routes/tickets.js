@@ -16,7 +16,7 @@ router.get("/get/:id", authRequired, ticketsController.getTicketById);
 router.post(
   "/create",
   authRequired,
-  requireRoles("CITIZEN", "DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  requireRoles("CITIZEN", "OPERATOR", "DEPARTMENT_ADMIN", "SUPERADMIN"),
   upload.single("photo"),
   ticketsController.createTicket
 );
@@ -24,21 +24,21 @@ router.post(
 router.put(
   "/update/:id",
   authRequired,
-  requireRoles("DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  requireRoles("OPERATOR", "DEPARTMENT_ADMIN", "FIELD_WORKER", "SUPERADMIN"),
   ticketsController.updateTicketStatus
 );
 
 router.delete(
   "/delete/:id",
   authRequired,
-  requireRoles("DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  requireRoles("DEPARTMENT_ADMIN", "SUPERADMIN"),
   ticketsController.deleteTicket
 );
 
 router.get(
   "/audit/:id",
   authRequired,
-  requireRoles("CITIZEN", "DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  requireRoles("CITIZEN", "OPERATOR", "DEPARTMENT_ADMIN", "FIELD_WORKER", "CITY_SUPERVISOR", "SUPERADMIN"),
   ticketsController.getAuditLogs
 );
 

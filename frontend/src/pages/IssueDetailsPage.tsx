@@ -1,11 +1,15 @@
-import type { ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import { getIssueApi } from "../api/issues";
+import { ChevronDown } from "lucide-react";
+import { getIssueApi, updateIssueStatusApi } from "../api/issues";
 import { PageHeader } from "../components/layout/PageHeader";
 import { StaticIssueMap } from "../components/map/IssuesMap";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
+import type { IssueStatus } from "../types";
+import { canManageWorkflow } from "../utils/roles";
+import { useAuth } from "../auth/AuthProvider";
 
 function getStatusStyles(status?: string) {
   switch (status) {
@@ -46,6 +50,7 @@ function formatReportedDate(date?: string) {
     year: "numeric"
   });
 }
+
 
 export function IssueDetailsPage() {
   const { id = "" } = useParams();

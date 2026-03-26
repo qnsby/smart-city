@@ -1,7 +1,7 @@
 const { normalizeRole } = require("../middleware/rbac");
 const { prisma } = require("../prisma");
 
-const editableRoles = new Set(["CITIZEN", "DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"]);
+const editableRoles = new Set(["CITIZEN", "OPERATOR", "DEPARTMENT_ADMIN", "FIELD_WORKER", "CITY_SUPERVISOR", "SUPERADMIN"]);
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const adminController = {

@@ -91,22 +91,88 @@ function warn(req, message, extra) {
   });
 }
 
+function mapFilterStatus(status) {
+  const value = String(status || "").trim().toUpperCase();
+  if (!value) return null;
+  if (value === "OPEN") return "NEW";
+  if (value === "RESOLVED") return ["DONE", "REJECTED"];
+  if (value === "IN_PROGRESS") return "IN_PROGRESS";
+  return null;
+}
+
+function canViewTicket(user, ticket) {
+  if (!user || !ticket) return false;
+  if (user.role === "SUPERADMIN" || user.role === "CITY_SUPERVISOR" || user.role === "OPERATOR" || user.role === "DEPARTMENT_ADMIN") {
+    return true;
+  }
+  if (user.role === "CITIZEN") return ticket.createdById === user.id;
+  if (user.role === "FIELD_WORKER") {
+    return Boolean(ticket.assignedDepartmentId) && ticket.assignedDepartmentId === user.department_id;
+  }
+  return false;
+}
+
+function canUpdateTicket(user, ticket) {
+  if (!user || !ticket) return false;
+  if (user.role === "SUPERADMIN") return true;
+  if (user.role === "FIELD_WORKER") {
+    return Boolean(ticket.assignedDepartmentId) && ticket.assignedDepartmentId === user.department_id;
+  }
+  return user.role === "OPERATOR" || user.role === "DEPARTMENT_ADMIN";
+}
+
 const ticketsController = {
   async getAllTickets(req, res) {
     const h3 = req.query.h3 ? String(req.query.h3) : null;
+    const q = req.query.q ? String(req.query.q).trim() : "";
+    const category = req.query.category ? String(req.query.category).trim().toUpperCase() : "";
+    const from = req.query.from ? String(req.query.from).trim() : "";
+    const to = req.query.to ? String(req.query.to).trim() : "";
+    const page = Math.max(1, Number(req.query.page || 1));
+    const limit = Math.min(100, Math.max(1, Number(req.query.limit || 20)));
+    const mappedStatus = mapFilterStatus(req.query.status);
     const where = {};
 
     if (h3) where.h3Index = h3;
     if (req.user.role === "CITIZEN") where.createdById = req.user.id;
+    if (req.user.role === "FIELD_WORKER") where.assignedDepartmentId = req.user.department_id;
+    if (category) {
+      where.category = {
+        code: category === "LIGHTING" ? "LIGHT" : category === "WASTE" ? "TRASH" : category
+      };
+    }
+    if (mappedStatus) {
+      where.status = Array.isArray(mappedStatus) ? { in: mappedStatus } : mappedStatus;
+    }
+    if (q) {
+      where.OR = [
+        { title: { contains: q, mode: "insensitive" } },
+        { description: { contains: q, mode: "insensitive" } },
+        { id: { contains: q, mode: "insensitive" } }
+      ];
+    }
+    if (from || to) {
+      where.createdAt = {};
+      if (from) where.createdAt.gte = new Date(`${from}T00:00:00.000Z`);
+      if (to) where.createdAt.lte = new Date(`${to}T23:59:59.999Z`);
+    }
 
-    const items = await prisma.ticket.findMany({
-      where,
-      include: ticketInclude,
-      orderBy: { createdAt: "desc" }
-    });
+    const [total, items] = await prisma.$transaction([
+      prisma.ticket.count({ where }),
+      prisma.ticket.findMany({
+        where,
+        include: ticketInclude,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit
+      })
+    ]);
 
     return res.json({
       count: items.length,
+      page,
+      limit,
+      total,
       items: await Promise.all(items.map(serializeTicket))
     });
   },
@@ -121,7 +187,7 @@ const ticketsController = {
       return res.status(404).json({ error: "Not found" });
     }
 
-    if (req.user.role === "CITIZEN" && ticket.createdById !== req.user.id) {
+    if (!canViewTicket(req.user, ticket)) {
       warn(req, "getTicketById forbidden ownership", { ticketId: ticket.id });
       return res.status(403).json({ error: "Forbidden (ownership)" });
     }
@@ -219,11 +285,15 @@ const ticketsController = {
 
     const ticket = await prisma.ticket.findUnique({
       where: { id: req.params.id },
-      select: { id: true, status: true }
+      select: { id: true, status: true, assignedDepartmentId: true, createdById: true }
     });
     if (!ticket) {
       warn(req, "updateTicketStatus not found", { ticketId: req.params.id });
       return res.status(404).json({ error: "Not found" });
+    }
+    if (!canUpdateTicket(req.user, ticket)) {
+      warn(req, "updateTicketStatus forbidden", { ticketId: req.params.id });
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     await prisma.$transaction([
@@ -289,7 +359,7 @@ const ticketsController = {
       return res.status(404).json({ error: "Not found" });
     }
 
-    if (req.user.role === "CITIZEN" && ticket.createdById !== req.user.id) {
+    if (!canViewTicket(req.user, ticket)) {
       warn(req, "getAuditLogs forbidden ownership", { ticketId: ticket.id });
       return res.status(403).json({ error: "Forbidden" });
     }

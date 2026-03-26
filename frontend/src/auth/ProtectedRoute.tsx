@@ -16,7 +16,7 @@ export function ProtectedRoute({ roles }: { roles?: Role[] }) {
   }
 
   if (!hasRequiredRole(user.role, roles)) {
-    return <Navigate to="/map" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Outlet />;

@@ -81,8 +81,11 @@ export function AdminUsersPage() {
                         }
                       >
                         <option value="citizen">citizen</option>
-                        <option value="dept_admin">dept_admin</option>
-                        <option value="university_admin">university_admin</option>
+                        <option value="operator">operator</option>
+                        <option value="department_admin">department_admin</option>
+                        <option value="field_worker">field_worker</option>
+                        <option value="city_supervisor">city_supervisor</option>
+                        <option value="superadmin">superadmin</option>
                       </select>
                     </td>
                     <td className="py-2 pr-3">

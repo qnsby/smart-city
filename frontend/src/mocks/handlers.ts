@@ -125,7 +125,7 @@ export const handlers = [
     if (auth instanceof Response) return auth;
     const issue = mockIssues.find((i) => i.id === params.id);
     if (!issue) return ok({ message: "Not found" }, 404);
-    if (!canViewIssue(auth, issue) && auth.role !== "university_admin") return unauthorized();
+    if (!canViewIssue(auth, issue)) return unauthorized();
     return ok(issue);
   }),
 
@@ -156,14 +156,18 @@ export const handlers = [
   http.get("/analytics/summary", ({ request }) => {
     const auth = requireUser(request);
     if (auth instanceof Response) return auth;
-    if (auth.role === "citizen") return ok({ message: "Forbidden" }, 403);
+    if (auth.role !== "department_admin" && auth.role !== "city_supervisor" && auth.role !== "superadmin") {
+      return ok({ message: "Forbidden" }, 403);
+    }
     return ok(buildSummary());
   }),
 
   http.get("/analytics/h3", ({ request }) => {
     const auth = requireUser(request);
     if (auth instanceof Response) return auth;
-    if (auth.role === "citizen") return ok({ message: "Forbidden" }, 403);
+    if (auth.role !== "department_admin" && auth.role !== "city_supervisor" && auth.role !== "superadmin") {
+      return ok({ message: "Forbidden" }, 403);
+    }
 
     const url = new URL(request.url);
     const status = url.searchParams.get("status");

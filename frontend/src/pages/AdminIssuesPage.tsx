@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { listIssuesApi, updateIssueStatusApi } from "../api/issues";
+import { useAuth } from "../auth/AuthProvider";
 import { PageHeader } from "../components/layout/PageHeader";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
@@ -13,6 +14,9 @@ export function AdminIssuesPage() {
   const [filters, setFilters] = useState<IssueFilters>({ page: 1, limit: 10, sort: "newest" });
   const queryClient = useQueryClient();
   const { push } = useToast();
+  const { user } = useAuth();
+  const canUpdateStatus =
+    user?.role === "operator" || user?.role === "department_admin" || user?.role === "field_worker";
 
   const query = useQuery({
     queryKey: ["issues", "admin", filters],
@@ -53,7 +57,7 @@ export function AdminIssuesPage() {
     <div className="space-y-4">
       <PageHeader
         title="Workflow Management"
-        subtitle="Search issues, filter queues and update statuses from one place."
+        subtitle="Search issues, filter queues and manage ticket visibility in one place."
       />
 
       <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
@@ -61,7 +65,7 @@ export function AdminIssuesPage() {
           <div>
             <h2 className="text-lg font-semibold">Filters</h2>
             <p className="text-sm text-slate-500">
-              Filter issues and update status with optimistic UI and rollback.
+              Filter issues and {canUpdateStatus ? "update status" : "review status"} from one place.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
@@ -142,17 +146,21 @@ export function AdminIssuesPage() {
                       <td className="py-2 pr-3">{issue.assigned_department_id || "-"}</td>
                       <td className="py-2 pr-3">{formatDateTime(issue.created_at)}</td>
                       <td className="py-2 pr-3">
-                        <select
-                          className="rounded-lg border border-slate-300 px-2 py-1 text-xs"
-                          value={issue.status}
-                          onChange={(e) =>
-                            mutation.mutate({ id: issue.id, status: e.target.value as IssueStatus })
-                          }
-                        >
-                          <option value="OPEN">OPEN</option>
-                          <option value="IN_PROGRESS">IN_PROGRESS</option>
-                          <option value="RESOLVED">RESOLVED</option>
-                        </select>
+                        {canUpdateStatus ? (
+                          <select
+                            className="rounded-lg border border-slate-300 px-2 py-1 text-xs"
+                            value={issue.status}
+                            onChange={(e) =>
+                              mutation.mutate({ id: issue.id, status: e.target.value as IssueStatus })
+                            }
+                          >
+                            <option value="OPEN">OPEN</option>
+                            <option value="IN_PROGRESS">IN_PROGRESS</option>
+                            <option value="RESOLVED">RESOLVED</option>
+                          </select>
+                        ) : (
+                          <span className="text-xs text-slate-500">View only</span>
+                        )}
                       </td>
                     </tr>
                   ))}

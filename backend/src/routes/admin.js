@@ -8,14 +8,14 @@ const router = Router();
 router.get(
   "/users",
   authRequired,
-  requireRoles("DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  requireRoles("DEPARTMENT_ADMIN", "CITY_SUPERVISOR", "SUPERADMIN"),
   adminController.listUsers
 );
 
 router.patch(
   "/users/:id",
   authRequired,
-  requireRoles("DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  requireRoles("DEPARTMENT_ADMIN", "CITY_SUPERVISOR", "SUPERADMIN"),
   adminController.updateUser
 );
 

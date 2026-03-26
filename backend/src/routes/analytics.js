@@ -6,16 +6,23 @@ const { requireRoles } = require("../middleware/rbac");
 const router = Router();
 
 router.get(
+  "/summary",
+  authRequired,
+  requireRoles("DEPARTMENT_ADMIN", "CITY_SUPERVISOR", "SUPERADMIN"),
+  analyticsController.getSummary
+);
+
+router.get(
   "/h3",
   authRequired,
-  requireRoles("DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  requireRoles("DEPARTMENT_ADMIN", "CITY_SUPERVISOR", "SUPERADMIN"),
   analyticsController.getH3Analytics
 );
 
 router.get(
   "/top-cells",
   authRequired,
-  requireRoles("DEPT_ADMIN", "SUPERVISOR", "SUPERADMIN"),
+  requireRoles("DEPARTMENT_ADMIN", "CITY_SUPERVISOR", "SUPERADMIN"),
   analyticsController.getTopCells
 );
 

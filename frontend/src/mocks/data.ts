@@ -1,4 +1,4 @@
-import type { AnalyticsSummary, Issue, Role, User } from "../types";
+import type { AnalyticsSummary, Issue, User } from "../types";
 
 const now = Date.now();
 
@@ -11,25 +11,49 @@ export const mockUsers: User[] = [
     department_id: null
   },
   {
+    id: "u-operator-1",
+    name: "Operator",
+    email: "operator@example.com",
+    role: "operator",
+    department_id: "GENERAL"
+  },
+  {
     id: "u-dept-1",
-    name: "Dept Admin",
+    name: "Department Admin",
     email: "deptadmin@example.com",
-    role: "dept_admin",
+    role: "department_admin",
     department_id: "WATER"
   },
   {
-    id: "u-uni-1",
-    name: "University Admin",
+    id: "u-worker-1",
+    name: "Field Worker",
+    email: "worker@example.com",
+    role: "field_worker",
+    department_id: "WATER"
+  },
+  {
+    id: "u-city-1",
+    name: "City Supervisor",
     email: "admin@example.com",
-    role: "university_admin",
+    role: "city_supervisor",
+    department_id: null
+  },
+  {
+    id: "u-super-1",
+    name: "Super Admin",
+    email: "superadmin@example.com",
+    role: "superadmin",
     department_id: null
   }
 ];
 
 export const mockPasswords: Record<string, string> = {
   "citizen@example.com": "password123",
+  "operator@example.com": "password123",
   "deptadmin@example.com": "password123",
-  "admin@example.com": "password123"
+  "worker@example.com": "password123",
+  "admin@example.com": "password123",
+  "superadmin@example.com": "password123"
 };
 
 export let mockIssues: Issue[] = Array.from({ length: 24 }).map((_, idx) => {
@@ -37,7 +61,7 @@ export let mockIssues: Issue[] = Array.from({ length: 24 }).map((_, idx) => {
   const category = (["road", "water", "lighting", "waste", "safety"] as const)[idx % 5];
   const created = new Date(now - idx * 36e5 * 6).toISOString();
   const updated = new Date(now - idx * 36e5 * 3).toISOString();
-  const createdBy = idx % 3 === 0 ? "u-citizen-1" : "u-uni-1";
+  const createdBy = idx % 3 === 0 ? "u-citizen-1" : "u-city-1";
   const dept = category === "water" ? "WATER" : category === "road" ? "ROADS" : "GENERAL";
   return {
     id: `issue-${idx + 1}`,
@@ -70,7 +94,7 @@ export let mockIssues: Issue[] = Array.from({ length: 24 }).map((_, idx) => {
       {
         id: `a-${idx + 1}-2`,
         action: "STATUS_SET",
-        actor_name: "Dept Admin",
+        actor_name: "Department Admin",
         timestamp: updated,
         meta: { status }
       }
@@ -113,8 +137,8 @@ export function parseToken(authHeader: string | null): User | null {
 }
 
 export function canViewIssue(user: User, issue: Issue) {
-  if (user.role === "university_admin") return true;
+  if (user.role === "city_supervisor" || user.role === "superadmin" || user.role === "operator" || user.role === "department_admin") return true;
   if (user.role === "citizen") return issue.created_by === user.id;
-  if (user.role === "dept_admin") return issue.assigned_department_id === user.department_id;
+  if (user.role === "field_worker") return issue.assigned_department_id === user.department_id;
   return false;
 }

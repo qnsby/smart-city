@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { Bell, Search, User } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthProvider";
+import { useAppShell } from "./AppShell";
+import logo from "../../assets/branding/logo.svg";
 
 interface PageHeaderProps {
   title: string;
@@ -20,13 +23,29 @@ export function PageHeader({
   rightSlot
 }: PageHeaderProps) {
   const { user } = useAuth();
+  const appShell = useAppShell();
   const showSearch = typeof searchValue === "string" && typeof onSearchChange === "function";
+  const collapsed = appShell?.collapsed ?? false;
 
   return (
     <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-      <div>
-        <h1 className="text-[34px] font-extrabold leading-none text-[#222]">{title}</h1>
-        {subtitle ? <p className="mt-2 text-[18px] text-[#3d3d3d]">{subtitle}</p> : null}
+      <div className="flex items-start gap-4">
+        {collapsed ? (
+          <div className="flex items-center gap-4 px-2 py-2">
+            <Link to="/dashboard" className="flex justify-center">
+              <img src={logo} alt="FixMyCity logo" className="h-12 w-auto" />
+            </Link>
+          </div>
+        ) : null}
+
+        <div>
+          <h1 className="text-[34px] font-extrabold leading-none text-[#222]">
+            {title}
+          </h1>
+          {subtitle ? (
+            <p className="mt-2 text-[18px] text-[#3d3d3d]">{subtitle}</p>
+          ) : null}
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-4">

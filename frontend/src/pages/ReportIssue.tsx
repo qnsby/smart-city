@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { PageHeader } from "../components/layout/PageHeader";
 import { StaticIssueMap } from "../components/map/IssuesMap";
@@ -17,6 +17,7 @@ export function ReportIssuePage() {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const navigate = useNavigate();
     const [photo,setPhoto] = useState<File | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const createMutation=useMutation({
         mutationFn: createIssueApi,
@@ -177,23 +178,25 @@ export function ReportIssuePage() {
                             <div className="pt-3 text-center">
                                 <button
                                     type="button"
+                                    onClick={() => fileInputRef.current?.click()}
                                     className="h-[44px] w-[180px] rounded-[8px] bg-[#4a4a4a] text-[16px] text-white transition hover:opacity-90"
                                 >
                                     Upload Photo
                                 </button>    
                             </div> 
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
+                                className="hidden"
+                            />
 
-                            <div>
-                                <label className="mb-2 block text-[16px] text-[#3a3a3a]">
-                                    Photo:
-                                </label>
-                                <input 
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
-                                    className="block w-full text-sm"
-                                />
-                            </div>
+                            {photo ? (
+                                <p className="text-center text-sm text-[#4a4a4a]">
+                                    {photo.name}
+                                </p>
+                            ) : null}
 
                             <div className="pt-1 text-center">
                                 <button 

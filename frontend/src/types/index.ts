@@ -1,4 +1,10 @@
-export type Role = "citizen" | "dept_admin" | "university_admin";
+export type Role =
+  | "citizen"
+  | "operator"
+  | "department_admin"
+  | "field_worker"
+  | "city_supervisor"
+  | "superadmin";
 
 export type IssueStatus = "OPEN" | "IN_PROGRESS" | "RESOLVED";
 
@@ -45,6 +51,7 @@ export interface Issue {
   updated_at: string;
   created_by: string;
   assigned_department_id: string | null;
+  assigned_department_code?: string | null;
   photo_url?: string | null;
   distance_km?: number;
   comments?: IssueComment[];

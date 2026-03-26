@@ -37,7 +37,9 @@ async function seed() {
         in: [
           "citizen.a@example.com",
           "dept.admin@example.com",
-          "supervisor@example.com",
+          "operator@example.com",
+          "field.worker@example.com",
+          "city.supervisor@example.com",
           "superadmin@example.com"
         ]
       }
@@ -58,37 +60,55 @@ async function seed() {
     await createUser({
       name: "Dept Admin",
       email: "dept.admin@example.com",
-      role: "DEPT_ADMIN",
+      role: "DEPARTMENT_ADMIN",
       departmentCode: "WATER",
       password: "pass123"
     })
   );
   users.push(
     await createUser({
-      name: "Supervisor",
-      email: "supervisor@example.com",
-      role: "SUPERVISOR",
+      name: "Operator",
+      email: "operator@example.com",
+      role: "OPERATOR",
+      departmentCode: "GENERAL",
+      password: "pass123"
+    })
+  );
+  users.push(
+    await createUser({
+      name: "Field Worker",
+      email: "field.worker@example.com",
+      role: "FIELD_WORKER",
+      departmentCode: "WATER",
+      password: "pass123"
+    })
+  );
+  users.push(
+    await createUser({
+      name: "City Supervisor",
+      email: "city.supervisor@example.com",
+      role: "CITY_SUPERVISOR",
       departmentCode: null,
       password: "pass123"
     })
   );
   users.push(
     await createUser({
-      name: "superadmin",
+      name: "Super Admin",
       email: "superadmin@example.com",
       role: "SUPERADMIN",
       departmentCode: null,
-      password: "superadmin"
+      password: "pass123"
     })
   );
 
   console.log("Seed done. Demo accounts:");
   console.table(
-    users.map((user, index) => ({
+    users.map((user) => ({
       name: user.name,
       email: user.email,
       role: user.role,
-      password: index === 3 ? "superadmin" : "pass123"
+      password: "pass123"
     }))
   );
 }

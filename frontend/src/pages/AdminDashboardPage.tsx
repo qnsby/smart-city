@@ -87,7 +87,7 @@ export function AdminDashboardPage() {
         </div>
       </section>
 
-      {user?.role === "university_admin" ? (
+      {user?.role === "city_supervisor" || user?.role === "superadmin" ? (
         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-card">
           <div className="flex items-center justify-between">
             <div>

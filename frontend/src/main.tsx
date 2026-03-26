@@ -19,9 +19,7 @@ import { USE_MSW } from "./utils/constants";
 import "./index.css";
 import { ReportIssuePage } from "./pages/ReportIssue";
 import { MyReportPage } from "./pages/MyReportsPage";
-
-
-
+import { OperatorPage } from "./pages/OperatorPage";
 
 async function enableMocks() {
   if (!USE_MSW) return;
@@ -30,7 +28,7 @@ async function enableMocks() {
 }
 
 const router = createBrowserRouter([
-  { path: "/", element:<HomePage />},
+  { path: "/", element: <HomePage /> },
   { path: "/login", element: <LoginPage /> },
   { path: "/register", element: <RegisterPage /> },
   {
@@ -41,21 +39,32 @@ const router = createBrowserRouter([
         children: [
           { path: "/dashboard", element: <DashboardPage /> },
           { path: "/issue/:id", element: <IssueDetailsPage /> },
-          { path: "/reportIssue", element: <ReportIssuePage />},
-          { path: "/myReport", element: <MyReportPage />}
+          { path: "/reportIssue", element: <ReportIssuePage /> },
+          { path: "/myReport", element: <MyReportPage /> }
         ]
       }
     ]
   },
   {
-    element: <ProtectedRoute roles={["dept_admin", "university_admin"]} />,
+    element: <ProtectedRoute roles={["department_admin", "city_supervisor", "superadmin"]} />,
     children: [
       {
         element: <AppShell />,
         children: [
           { path: "/admin/dashboard", element: <AdminDashboardPage /> },
-          { path: "/admin/issues", element: <AdminIssuesPage /> },
           { path: "/admin/users", element: <AdminUsersPage /> }
+        ]
+      }
+    ]
+  },
+  {
+    element: <ProtectedRoute roles={["operator", "department_admin", "field_worker", "city_supervisor", "superadmin"]} />,
+    children: [
+      {
+        element: <AppShell />,
+        children: [
+          { path: "/admin/issues", element: <AdminIssuesPage /> },
+          { path: "/operator", element: <OperatorPage /> }
         ]
       }
     ]
