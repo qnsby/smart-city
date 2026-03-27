@@ -10,6 +10,7 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
+router.get("/departments", authRequired, ticketsController.listDepartments);
 router.get("/getAll", authRequired, ticketsController.getAllTickets);
 router.get("/get/:id", authRequired, ticketsController.getTicketById);
 

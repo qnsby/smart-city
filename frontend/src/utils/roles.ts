@@ -18,7 +18,7 @@ export function hasRequiredRole(userRole: Role, allowed?: Role[]) {
 }
 
 export function isAdminRole(role: Role | null | undefined) {
-  return role === "department_admin" || role === "city_supervisor" || role === "superadmin";
+  return role === "city_supervisor" || role === "superadmin";
 }
 
 export function canViewAnalytics(role: Role | null | undefined) {
@@ -26,7 +26,7 @@ export function canViewAnalytics(role: Role | null | undefined) {
 }
 
 export function canManageWorkflow(role: Role | null | undefined) {
-  return role === "operator" || role === "department_admin" || role === "field_worker" || role === "superadmin";
+  return role === "operator" || role === "department_admin" || role === "superadmin";
 }
 
 export function canManageUsers(role: Role | null | undefined) {
@@ -34,5 +34,9 @@ export function canManageUsers(role: Role | null | undefined) {
 }
 
 export function canCreateTickets(role: Role | null | undefined) {
-  return role === "citizen" || role === "operator" || role === "department_admin" || role === "superadmin";
+  return role === "citizen" || role === "superadmin";
+}
+
+export function canManageTasks(role: Role | null | undefined) {
+  return role === 'field_worker' || role === "superadmin";
 }

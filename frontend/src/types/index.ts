@@ -39,19 +39,33 @@ export interface IssueComment {
   created_at: string;
 }
 
+export interface DepartmentOption {
+  id: string;
+  code: string;
+  name: string;
+}
+
 export interface Issue {
   id: string;
   title: string;
   description: string;
-  category: IssueCategory;
+  category: string;
+  category_id?: string | null;
+  category_code?: string | null;
+  category_name?: string | null;
+
   status: IssueStatus;
   lat: number;
   lng: number;
+
   created_at: string;
   updated_at: string;
   created_by: string;
+  
   assigned_department_id: string | null;
   assigned_department_code?: string | null;
+  assigned_department_name?: string | null;
+
   photo_url?: string | null;
   distance_km?: number;
   comments?: IssueComment[];

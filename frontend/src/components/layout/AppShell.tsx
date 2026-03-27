@@ -5,7 +5,9 @@ import {
   canCreateTickets,
   canManageUsers,
   canManageWorkflow,
-  canViewAnalytics
+  canViewAnalytics,
+  canManageTasks,
+  isAdminRole
 } from "../../utils/roles";
 import logo from "../../assets/branding/logo.svg";
 import {
@@ -18,7 +20,8 @@ import {
   ListChecks,
   Users,
   LogOut,
-  BadgeAlert
+  BadgeAlert,
+  ChartLine,
 } from "lucide-react";
 
 const AppShellContext = createContext<{
@@ -33,6 +36,8 @@ export function AppShell() {
   const canAnalytics = canViewAnalytics(user?.role);
   const canUsers = canManageUsers(user?.role);
   const [collapsed, setCollapsed] = useState(false);
+  const canTasks = canManageTasks(user?.role)
+  const isAdmin = isAdminRole(user?.role)
 
   return (
     <AppShellContext.Provider value={{ collapsed, setCollapsed }}>
@@ -80,11 +85,13 @@ export function AppShell() {
               </div>
 
               <nav className="mt-10 space-y-2">
-                <NavItem
-                  to="/dashboard"
-                  label="Dashboard"
-                  icon={<LayoutDashboard size={18} />}
-                />
+                {canCreate ? (
+                  <NavItem
+                    to="/dashboard"
+                    label="Dashboard"
+                    icon={<LayoutDashboard size={18} />}
+                  />
+                ) : null}  
 
                 {canCreate ? (
                   <NavItem
@@ -94,17 +101,13 @@ export function AppShell() {
                   />
                 ) : null}
 
-                <NavItem
-                  to="/myReport"
-                  label="My Reports"
-                  icon={<ClipboardList size={18} />}
-                />
-
-                <NavItem
-                  to="/dashboard"
-                  label="Profile / Settings"
-                  icon={<Settings size={18} />}
-                />
+                {canCreate ? (
+                  <NavItem
+                    to="/myReport"
+                    label="My Reports"
+                    icon={<ClipboardList size={18} />}
+                  />
+                ) : null}
 
                 {canWorkflow ? (
                   <NavItem
@@ -122,7 +125,7 @@ export function AppShell() {
                   />
                 ) : null}
 
-                {canWorkflow ? (
+                {isAdmin ? (
                   <NavItem
                     to="/admin/issues"
                     label="Admin Issues"
@@ -137,6 +140,34 @@ export function AppShell() {
                     icon={<Users size={18} />}
                   />
                 ) : null}
+
+                {canTasks ? (
+                  <NavItem
+                    to="/tasks"
+                    label="My Tasks"
+                    icon={<ClipboardList size={18} />}
+                  />
+                ) : null}
+                
+                {canAnalytics ? (
+                  <NavItem
+                    to="/analytics/dashboard"
+                    label="Dashboard"
+                    icon={<LayoutDashboard size={18} />}
+                  />
+                ) : null }
+                {canAnalytics ? (
+                  <NavItem
+                    to="/analytics"
+                    label="Analytics"
+                    icon={<ChartLine size={18} />}
+                  />
+                ) : null}
+                <NavItem
+                  to="/dashboard"
+                  label="Profile / Settings"
+                  icon={<Settings size={18} />}
+                />
               </nav>
 
               <div className="mt-6 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">

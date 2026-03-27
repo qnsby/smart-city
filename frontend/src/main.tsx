@@ -20,6 +20,9 @@ import "./index.css";
 import { ReportIssuePage } from "./pages/ReportIssue";
 import { MyReportPage } from "./pages/MyReportsPage";
 import { OperatorPage } from "./pages/OperatorPage";
+import { TasksPage } from "./pages/TasksPage";
+import { SupervisorPage } from "./pages/SupervisorPage";
+import { AnalyticsPage } from "./pages/AnalyticsPage";
 
 async function enableMocks() {
   if (!USE_MSW) return;
@@ -65,6 +68,29 @@ const router = createBrowserRouter([
         children: [
           { path: "/admin/issues", element: <AdminIssuesPage /> },
           { path: "/operator", element: <OperatorPage /> }
+        ]
+      }
+    ]
+  },
+  {
+    element: <ProtectedRoute roles={["field_worker", "superadmin"]} />,
+    children: [
+      {
+        element: <AppShell />,
+        children: [
+          { path: "/tasks", element: <TasksPage />}
+        ]
+      }
+    ]
+  },
+  {
+    element: <ProtectedRoute roles={["city_supervisor", "superadmin"]} />,
+    children: [
+      {
+        element: <AppShell />,
+        children: [
+          {path: "/analytics/dashboard", element: <SupervisorPage />},
+          {path: "/analytics", element: <AnalyticsPage />}
         ]
       }
     ]

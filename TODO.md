@@ -4,4 +4,4 @@
 - Fix Endpoints
 - Fix Layouts related to Figma
 - Notification system
-- 
+- Make real data in analytics(remove mock data)

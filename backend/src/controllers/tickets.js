@@ -51,26 +51,40 @@ async function serializeTicket(ticket) {
   const firstAttachment = ticket.attachments?.[0] || null;
   const photoUrl = firstAttachment ? await createSignedPhotoUrl(firstAttachment.storagePath) : null;
   const categoryCode = ticket.category?.code || null;
-  const category = categoryAliases[categoryCode] || String(categoryCode || "").toLowerCase() || null;
-  const assignedDepartmentCode = ticket.assignedDepartment?.code || null;
+  const normalizedCategory =
+    categoryCode === "LIGHT"
+      ? "lighting"
+      : categoryCode === "TRASH"
+        ? "waste"
+        : String(categoryCode || "").toLowerCase() || null;
 
   return {
     id: ticket.id,
     title: ticket.title,
     description: ticket.description,
-    category,
     status: ticket.status,
+
     latitude: ticket.latitude,
     longitude: ticket.longitude,
     h3_index: ticket.h3Index,
+
     created_by: ticket.createdById,
-    assigned_department_id: ticket.assignedDepartmentId,
-    assigned_department_code: assignedDepartmentCode,
-    assigned_team: assignedDepartmentCode,
     created_at: ticket.createdAt,
     updated_at: ticket.updatedAt,
     resolved_at: ticket.resolvedAt,
+
+    category: normalizedCategory,
+    category_id: ticket.categoryId,
+    category_code: ticket.category?.code || null,
+    category_name: ticket.category?.name || null,
+
+    assigned_department_id: ticket.assignedDepartmentId,
+    assigned_department_code: ticket.assignedDepartment?.code || null,
+    assigned_department_name: ticket.assignedDepartment?.name || null,
+    assigned_team: ticket.assignedDepartment?.code || null,
+
     photo_url: photoUrl,
+    
     comments: ticket.comments?.map((comment) => ({
       id: comment.id,
       author: comment.author?.name || null,
@@ -121,7 +135,29 @@ function canUpdateTicket(user, ticket) {
   return user.role === "OPERATOR" || user.role === "DEPARTMENT_ADMIN";
 }
 
+function canAssignDepartment(user) {
+  if (!user) return false;
+  return user.role === "SUPERADMIN" || user.role === "OPERATOR" || user.role === "DEPARTMENT_ADMIN";
+}
+
 const ticketsController = {
+  async listDepartments(_req, res) {
+    const departments = await prisma.department.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        code: true,
+        name: true
+      },
+      orderBy: { name: "asc" }
+    });
+
+    return res.json({
+      count: departments.length,
+      items: departments
+    });
+  },
+
   async getAllTickets(req, res) {
     const h3 = req.query.h3 ? String(req.query.h3) : null;
     const q = req.query.q ? String(req.query.q).trim() : "";
@@ -277,8 +313,16 @@ const ticketsController = {
   },
 
   async updateTicketStatus(req, res) {
-    const { status, comment } = req.body || {};
-    if (!allowedStatuses.includes(status)) {
+    const { status, comment, assigned_department_id } = req.body || {};
+    const nextStatus = status == null || status === "" ? null : String(status).trim().toUpperCase();
+    const departmentInputProvided = Object.prototype.hasOwnProperty.call(req.body || {}, "assigned_department_id");
+
+    if (!nextStatus && !departmentInputProvided) {
+      warn(req, "updateTicketStatus missing editable fields", { body: req.body || null });
+      return res.status(400).json({ error: "Nothing to update" });
+    }
+
+    if (nextStatus && !allowedStatuses.includes(nextStatus)) {
       warn(req, "updateTicketStatus invalid status", { status });
       return res.status(400).json({ error: "Invalid status" });
     }
@@ -291,41 +335,109 @@ const ticketsController = {
       warn(req, "updateTicketStatus not found", { ticketId: req.params.id });
       return res.status(404).json({ error: "Not found" });
     }
-    if (!canUpdateTicket(req.user, ticket)) {
+
+    const isStatusChangeRequested = Boolean(nextStatus);
+    const canEditStatus = !isStatusChangeRequested || canUpdateTicket(req.user, ticket);
+    if (!canEditStatus) {
       warn(req, "updateTicketStatus forbidden", { ticketId: req.params.id });
       return res.status(403).json({ error: "Forbidden" });
     }
 
-    await prisma.$transaction([
+    let nextDepartmentId = ticket.assignedDepartmentId;
+    if (departmentInputProvided) {
+      if (!canAssignDepartment(req.user)) {
+        warn(req, "updateTicketStatus forbidden department reassignment", { ticketId: req.params.id });
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      if (assigned_department_id === null || assigned_department_id === "") {
+        nextDepartmentId = null;
+      } else {
+        const department = await prisma.department.findFirst({
+          where: {
+            isActive: true,
+            OR: [
+              { id: String(assigned_department_id) },
+              { code: String(assigned_department_id).trim().toUpperCase() }
+            ]
+          },
+          select: { id: true }
+        });
+        if (!department) {
+          return res.status(400).json({ error: "Department not found" });
+        }
+        nextDepartmentId = department.id;
+      }
+    }
+
+    const isStatusChanged = Boolean(nextStatus) && nextStatus !== ticket.status;
+    const isDepartmentChanged = departmentInputProvided && nextDepartmentId !== ticket.assignedDepartmentId;
+
+    if (!isStatusChanged && !isDepartmentChanged) {
+      const current = await prisma.ticket.findUnique({
+        where: { id: req.params.id },
+        include: ticketInclude
+      });
+      return res.json(await serializeTicket(current));
+    }
+
+    const transactionSteps = [
       prisma.ticket.update({
         where: { id: req.params.id },
         data: {
-          status,
-          resolvedAt: status === "DONE" ? new Date() : null
-        }
-      }),
-      prisma.ticketStatusHistory.create({
-        data: {
-          ticketId: req.params.id,
-          fromStatus: ticket.status,
-          toStatus: status,
-          changedById: req.user.id,
-          comment: comment ? String(comment) : null
-        }
-      }),
-      prisma.auditLog.create({
-        data: {
-          userId: req.user.id,
-          action: "STATUS_UPDATED",
-          entityType: "TICKET",
-          entityId: req.params.id,
-          meta: {
-            from: ticket.status,
-            to: status
-          }
+          status: isStatusChanged ? nextStatus : undefined,
+          resolvedAt: isStatusChanged
+            ? (nextStatus === "DONE" ? new Date() : null)
+            : undefined,
+          assignedDepartmentId: isDepartmentChanged ? nextDepartmentId : undefined
         }
       })
-    ]);
+    ];
+
+    if (isStatusChanged) {
+      transactionSteps.push(
+        prisma.ticketStatusHistory.create({
+          data: {
+            ticketId: req.params.id,
+            fromStatus: ticket.status,
+            toStatus: nextStatus,
+            changedById: req.user.id,
+            comment: comment ? String(comment) : null
+          }
+        }),
+        prisma.auditLog.create({
+          data: {
+            userId: req.user.id,
+            action: "STATUS_UPDATED",
+            entityType: "TICKET",
+            entityId: req.params.id,
+            meta: {
+              from: ticket.status,
+              to: nextStatus
+            }
+          }
+        })
+      );
+    }
+
+    if (isDepartmentChanged) {
+      transactionSteps.push(
+        prisma.auditLog.create({
+          data: {
+            userId: req.user.id,
+            action: "DEPARTMENT_ASSIGNED",
+            entityType: "TICKET",
+            entityId: req.params.id,
+            meta: {
+              from_department_id: ticket.assignedDepartmentId,
+              to_department_id: nextDepartmentId
+            }
+          }
+        })
+      );
+    }
+
+    await prisma.$transaction(transactionSteps);
 
     const updated = await prisma.ticket.findUnique({
       where: { id: req.params.id },

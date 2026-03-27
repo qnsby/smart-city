@@ -1,5 +1,5 @@
 import { apiClient } from "./client";
-import type { CreateIssuePayload, Issue, IssueFilters, PaginatedResponse } from "../types";
+import type { CreateIssuePayload, DepartmentOption, Issue, IssueFilters, PaginatedResponse } from "../types";
 
 type BackendTicketStatus = "NEW" | "IN_PROGRESS" | "DONE" | "REJECTED";
 
@@ -8,6 +8,9 @@ interface BackendTicket {
   title: string;
   description: string | null;
   category: string;
+  category_id?: string | null;
+  category_code?: string | null;
+  category_name?: string | null;
   status: BackendTicketStatus;
   latitude: number;
   longitude: number;
@@ -16,6 +19,7 @@ interface BackendTicket {
   created_by: string;
   assigned_department_id: string | null;
   assigned_department_code?: string | null;
+  assigned_department_name?: string | null;
   photo_url?: string | null;
 }
 
@@ -25,6 +29,11 @@ interface BackendTicketListResponse {
   limit: number;
   total: number;
   items: BackendTicket[];
+}
+
+interface BackendDepartmentsResponse {
+  count: number;
+  items: DepartmentOption[];
 }
 
 interface BackendAuditItem {
@@ -53,20 +62,15 @@ function toBackendStatus(status: Issue["status"]): BackendTicketStatus {
   return "NEW";
 }
 
-function mapCategory(category: string): Issue["category"] {
-  const c = String(category || "").toLowerCase();
-  if (c === "road" || c === "water" || c === "lighting" || c === "waste" || c === "safety") {
-    return c;
-  }
-  return "other";
-}
-
 function mapTicketToIssue(ticket: BackendTicket): Issue {
   return {
     id: ticket.id,
     title: ticket.title,
     description: ticket.description || "",
-    category: mapCategory(ticket.category),
+    category: ticket.category || "other",
+    category_id: ticket.category_id ?? null,
+    category_code: ticket.category_code ?? null,
+    category_name: ticket.category_name ?? null,
     status: mapBackendStatus(ticket.status),
     lat: ticket.latitude,
     lng: ticket.longitude,
@@ -75,6 +79,7 @@ function mapTicketToIssue(ticket: BackendTicket): Issue {
     created_by: ticket.created_by,
     assigned_department_id: ticket.assigned_department_id ?? null,
     assigned_department_code: ticket.assigned_department_code ?? null,
+    assigned_department_name: ticket.assigned_department_name ?? null,
     photo_url: ticket.photo_url ?? null
   };
 }
@@ -160,4 +165,26 @@ export async function updateIssueStatusApi(id: string, status: Issue["status"]) 
     status: toBackendStatus(status)
   });
   return mapTicketToIssue(data);
+}
+
+export async function updateIssueApi(
+  id: string,
+  payload: { status?: Issue["status"]; assigned_department_id?: string | null }
+) {
+  const body: { status?: BackendTicketStatus; assigned_department_id?: string | null } = {};
+
+  if (payload.status !== undefined) {
+    body.status = toBackendStatus(payload.status);
+  }
+  if (payload.assigned_department_id !== undefined) {
+    body.assigned_department_id = payload.assigned_department_id;
+  }
+
+  const { data } = await apiClient.put<BackendTicket>(`/tickets/update/${id}`, body);
+  return mapTicketToIssue(data);
+}
+
+export async function listDepartmentsApi() {
+  const { data } = await apiClient.get<BackendDepartmentsResponse>("/tickets/departments");
+  return data.items;
 }
