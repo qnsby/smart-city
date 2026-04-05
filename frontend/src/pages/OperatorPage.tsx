@@ -104,7 +104,7 @@ export function OperatorPage() {
                 }
                 searchPlaceholder="Search"
             />
-            <section className="rounded-[28px] bg-white px-6 py-6 shadow-sm">
+            <section className="rounded-[28px] bg-[#FFFFFF] px-6 py-6 shadow-sm">
                 <div className="mb-6 flex items-center justify-between">
                     <h2 className="text-[24px] font-semibold text-[#222">Latest Tickets</h2>
 
@@ -112,7 +112,7 @@ export function OperatorPage() {
                         type="button"
                         onClick={openSelectedTicket}
                         disabled={!selectedTicketId}
-                        className="rounded-[10px] border border-slate-300 bg-white px-6 py-3 text-[16px] text-[#222] transtion hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-[10px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-6 py-3 text-[16px] text-[#202020] transtion hover:bg-[#F2F5F8] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         View Ticket
                     </button>
@@ -126,7 +126,7 @@ export function OperatorPage() {
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[900px] border-separate border-spacing-y-0 text-left">
                                 <thead>
-                                    <tr className="bg-[#CDE2EF] text-[17px] text-[#39457A]">
+                                    <tr className="bg-[#F2F5F8] text-[17px] text-[#2E2E5A]">
                                         <th className="rounded-l-[8px] px-7 py-4 font-medium">Ticket ID</th>
                                         <th className="px-7 py-5 font-medium">Title</th>
                                         <th className="px-7 py-5 font-medium">Category</th>
@@ -144,8 +144,8 @@ export function OperatorPage() {
                                                 key={issue.id}
                                                 onClick={() => handleRowClick(issue.id)}
                                                 onDoubleClick={() => handleRowDoubleClick(issue.id)}
-                                                className={`cursor-pointer text[16px] text-[#5A5A5A] transition ${
-                                                    isSelected ? "bg-[#017CB31A]" : striped ? "bg-[#EDF7FC]" : "bg-white"
+                                                className={`cursor-pointer text[16px] text-[#2B2B2B] transition ${
+                                                    isSelected ? "bg-[#2E2E5A]/10" : striped ? "bg-[#F2F5F8]" : "bg-[#FFFFFF]"
                                                 }`}
                                             >
                                                 <td className="px-7 py-5">{issue.id}</td>
@@ -162,7 +162,7 @@ export function OperatorPage() {
                             </table>
                         </div>
 
-                        <div className="mt-8 flex items-center justify-center gap-6 text-[18px] text-[#5A5A5A]">
+                        <div className="mt-8 flex items-center justify-center gap-6 text-[18px] text-[#2B2B2B]">
                             <button
                                 type="button"
                                 disabled={(filters.page || 1) <= 1}
@@ -172,12 +172,12 @@ export function OperatorPage() {
                                         page: Math.max(1, (prev.page || 1) - 1)
                                     }))
                                 }
-                                className="rounded-full bg-[#F2F0EE] px-5 py-2 disabled:opacity-50"
+                                className="rounded-full bg-[#FFFFFF] px-5 py-2 disabled:opacity-50"
                             >
                                 Previous
                             </button>
 
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#EAF1FF] text-[#38558B] shadow-sm">
+                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2E2E5A]/12 text-[#2E2E5A] shadow-sm">
                                 {query.data?.page ?? 1}
                             </span>
 

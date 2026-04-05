@@ -5,18 +5,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: "#0d1b21",
-        mist: "#edf4f7",
+        ink: "#202020",
+        mist: "#F2F5F8",
+        shell: "#F2F5F8",
+        surface: "#FFFFFF",
         brand: {
-          50: "#ecfdf7",
-          100: "#d1faeb",
-          500: "#12b981",
-          600: "#0ea571",
-          700: "#0b7f58"
+          DEFAULT: "#2E2E5A",
+          50: "#F2F5F8",
+          100: "#FFFFFF",
+          500: "#2E2E5A",
+          600: "#2B2B2B",
+          700: "#202020"
+        },
+        text: {
+          DEFAULT: "#2B2B2B",
+          strong: "#202020"
         }
       },
       boxShadow: {
-        card: "0 8px 30px rgba(13, 27, 33, 0.08)"
+        card: "0 8px 30px rgba(32, 32, 32, 0.08)"
       }
     }
   },

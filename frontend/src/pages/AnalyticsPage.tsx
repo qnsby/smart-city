@@ -93,7 +93,7 @@ export function AnalyticsPage() {
     }, [issues]);
 
     return (
-        <div className="min-h-screen bg-[#f4f6f8] px-8 py-6">
+        <div className="min-h-screen bg-[#F2F5F8] px-8 py-6">
             <div className="mx-auto max-w-[1280px]">
                 <PageHeader
                     title="Analytics Dashboard"
@@ -105,24 +105,24 @@ export function AnalyticsPage() {
                         title="Totla Tickets"
                         value={metrics.total}
                         change="+11.01%"
-                        bgClass="bg-[#ececf8]"
+                        bgClass="bg-[#FFFFFF]"
                     />
                     <MetricCard
                         title="Open Issues"
                         value={metrics.open}
                         change="-0.03%"
-                        bgClass="bg-[#e5eef9]"
+                        bgClass="bg-[#FFFFFF]"
                     />
                     <MetricCard
                         title="Avg Resolution Time"
                         value={metrics.avgResolutionTime}
                         change="+15.03%"
-                        bgClass="bg-[#ececf8]"
+                        bgClass="bg-[#FFFFFF]"
                     />
                 </div>
 
                 <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_244px]">
-                    <section className="rounded-[26px] bg-white px-6 py-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                    <section className="rounded-[26px] bg-[#FFFFFF] px-6 py-6 shadow-[0_8px_30px_rgba(32,32,32,0.04)]">
                         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
                             <div className="flex flex-wrap items-center gap-6 text-[15px]">
                                 <button className="font-semibold text-[#202020]">Total</button>
@@ -177,7 +177,7 @@ export function AnalyticsPage() {
                         </div>
                     </section>
 
-                    <section className="rounded-[26px] bg-white px-5 py-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                    <section className="rounded-[26px] bg-[#FFFFFF] px-5 py-6 shadow-[0_8px_30px_rgba(32,32,32,0.04)]">
                         <h3 className="text-[16px] font-semibold text-[#202020]">Traffic by Website</h3>
 
                         <div className="mt-6 space-y-7">
@@ -189,7 +189,7 @@ export function AnalyticsPage() {
                 </div>
 
                 <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_1fr]">
-                    <section className="rounded-[26px] bg-white px-6 py-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                    <section className="rounded-[26px] bg-[#FFFFFF] px-6 py-6 shadow-[0_8px_30px_rgba(32,32,32,0.04)]">
                         <h3 className="text-[16px] font-semibold text-[#202020]">Traffic by Device</h3>
 
                         <div className="mt-6 h-[180px]">
@@ -219,7 +219,7 @@ export function AnalyticsPage() {
                         </div>
                     </section>
 
-                    <section className="rounded-[26px] bg-white px-6 py-6 shadow-[0_8px_30px_rgba(15,23,42,0.04)]">
+                    <section className="rounded-[26px] bg-[#FFFFFF] px-6 py-6 shadow-[0_8px_30px_rgba(32,32,32,0.04)]">
                         <h3 className="text-[16px] font-semibold text-[#202020]">Traffic by Location</h3>
 
                         <div className="mt-6 grid grid-cols-1 items-center gap-6 md:grid-cols-[220px_1fr]">
@@ -261,7 +261,7 @@ export function AnalyticsPage() {
                     </section>
                 </div>
 
-                <section className="mt-6 rounded-[26px] bg-white px-6 py-6 shadow-[0_8px_30px_rgba(15,23,42,0.04">
+                <section className="mt-6 rounded-[26px] bg-[#FFFFFF] px-6 py-6 shadow-[0_8px_30px_rgba(32,32,32,0.04)]">
                     <h3 className="text-[16px] font-semibold text-[#202020]">Marketing & SEO</h3>
 
                     <div className="mt-6 h-[190px]">
@@ -307,7 +307,7 @@ function MetricCard({
     bgClass: string;
 }) {
     return (
-        <div className={`rounded-[24px] px-6 py-5 ${bgClass}`}>
+        <div className={`rounded-[24px] border border-[#2B2B2B]/10 px-6 py-5 ${bgClass}`}>
             <div className="flex items-start justify-between gap-4">
                 <div>
                     <p className="text-[16px] text-[#202020]">{title}</p>

@@ -62,15 +62,15 @@ export function DashboardPage() {
         <div className="flex flex-col gap-6">
           <button
             onClick={() => setIsReportOpen(true)}
-            className="h-[50px] w-[197px] rounded-[15px] border border-[#7186a5] bg-white text-[16px] font-medium text-[#2a2a2a] shadow-sm transition hover:bg-slate-50"
+            className="h-[50px] w-[197px] rounded-[15px] border border-[#2B2B2B]/15 bg-[#FFFFFF] text-[16px] font-medium text-[#202020] shadow-sm transition hover:bg-[#F2F5F8]"
           >
             Create New Report
           </button>
 
-          <div className="flex h-[246px] w-[197px] flex-col rounded-[16px] border border-[#7186a5] bg-white p-4 shadow-sm">
-            <h2 className="text-[16px] font-semibold text-[#2a2a2a]">Recent reports</h2>
+          <div className="flex h-[246px] w-[197px] flex-col rounded-[16px] border border-[#2B2B2B]/15 bg-[#FFFFFF] p-4 shadow-sm">
+            <h2 className="text-[16px] font-semibold text-[#202020]">Recent reports</h2>
 
-            <div className="mt-4 flex-1 space-y-3 overflow-y-auto pr-1 text-[14px] text-[#3f3f3f]">
+            <div className="mt-4 flex-1 space-y-3 overflow-y-auto pr-1 text-[14px] text-[#2B2B2B]">
               {recentReports.length === 0 ? (
                 <p>No reports yet</p>
               ) : (
@@ -80,7 +80,7 @@ export function DashboardPage() {
 
             <Link
               to="/admin/issues"
-              className="mt-4 inline-flex items-center text-[13px] text-[#4a4a4a] hover:underline"
+              className="mt-4 inline-flex items-center text-[13px] text-[#2E2E5A] hover:underline"
             >
               View More <span className="ml-1">-</span>
             </Link>
@@ -103,8 +103,8 @@ export function DashboardPage() {
 function RecentReportItem({ issue }: { issue: Issue }) {
   return (
     <div>
-      <p className="break-words text-[16px] leading-5 text-[#303030]">{issue.title}</p>
-      <p className="text-[16px] leading-5 text-[#4b4b4b]">Status: {humanizeStatus(issue.status)}</p>
+      <p className="break-words text-[16px] leading-5 text-[#202020]">{issue.title}</p>
+      <p className="text-[16px] leading-5 text-[#2B2B2B]">Status: {humanizeStatus(issue.status)}</p>
     </div>
   );
 }

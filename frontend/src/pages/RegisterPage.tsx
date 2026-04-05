@@ -50,12 +50,12 @@ const schema = z
     });
 
     return (
-      <div className="min-h-screen bg-[#f5f5f5] px-6 py-6 lg:px-10">
-        <div className="relative min-h-[calc(100vh-3rem)] rounded-[24px] border border-black bg-[#f5f5f5]">
+      <div className="min-h-screen bg-[#F2F5F8] px-6 py-6 lg:px-10">
+        <div className="relative min-h-[calc(100vh-3rem)] rounded-[24px] border border-[#2B2B2B]/10 bg-[#F2F5F8]">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="absolute left-8 top-8 flex h-10 w-10 items-center justify-center rounded-full text-black transition hover:bg-black/5"
+            className="absolute left-8 top-8 flex h-10 w-10 items-center justify-center rounded-full bg-[#FFFFFF] text-[#202020] transition hover:bg-[#FFFFFF]"
           >
             <ArrowLeft size={24} />
           </button>
@@ -74,7 +74,7 @@ const schema = z
                   onSubmit={handleSubmit((values) => mutation.mutate(values))}
                 >
                   <div>
-                    <div className="flex items-center gap-3 rounded-[18px] bg-[#F0EDFFCC] px-5 py-4">
+                    <div className="flex items-center gap-3 rounded-[18px] bg-[#FFFFFF] px-5 py-4">
                       <User size={20} className="text-black/70" />
                       <input 
                         {...register("name")}
@@ -88,7 +88,7 @@ const schema = z
                   </div>
 
                   <div>
-                    <div className="flex items-center gap-3 rounded-[18px] bg-[#F0EDFFCC] px-5 py-4">
+                    <div className="flex items-center gap-3 rounded-[18px] bg-[#FFFFFF] px-5 py-4">
                       <Mail size={20} className="text-black/70" />
                       <input
                         {...register("email")}
@@ -103,7 +103,7 @@ const schema = z
                   </div>
 
                   <div>
-                    <div className="flex items-center gap-3 rounded-[18px] bg-[#F0EDFFCC] px-5 py-4">
+                    <div className="flex items-center gap-3 rounded-[18px] bg-[#FFFFFF] px-5 py-4">
                       <Lock size={20} className="text-black/70" />
                       <input
                         {...register("password")}
@@ -118,7 +118,7 @@ const schema = z
                   </div>
 
                   <div>
-                    <div className="flex items-center gap-3 rounded-[18px] bg-[#F0EDFFCC] px-5 py-4">
+                    <div className="flex items-center gap-3 rounded-[18px] bg-[#FFFFFF] px-5 py-4">
                       <Lock size={20} className="text-black/70" />
                       <input
                         {...register("confirmPassword")}
@@ -135,7 +135,7 @@ const schema = z
                     <button
                       type="submit"
                       disabled={mutation.isPending}
-                      className="mx-auto block min-w-[220px] rounded-full bg-black px-10 py-4 text-lg font-bold uppercase tracking-[0.18em] text-white transition hover:opacity-90 disabled:opacity-60"
+                      className="mx-auto block min-w-[220px] rounded-full bg-[#2E2E5A] px-10 py-4 text-lg font-bold uppercase tracking-[0.18em] text-white transition hover:bg-[#202020] disabled:opacity-60"
                     >
                       {mutation.isPending ? "Creating...": "SIGN UP"}
                     </button>
@@ -148,7 +148,7 @@ const schema = z
                       <div className="w-full border-t border-black/10" />
                     </div>
                     <p className="relative text-center text-[16px] font-semibold text-black/85">
-                      <span className="bg-[#f5f5f5] px-3">
+                      <span className="bg-[#F2F5F8] px-3">
                         Already have an account?{" "}
                         <Link to="/login" className="font-bold hover:underline">Login</Link>
                       </span>

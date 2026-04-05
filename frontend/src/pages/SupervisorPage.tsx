@@ -24,7 +24,7 @@ export function SupervisorPage() {
         : {lat: 43.238949, lng: 76.889709 };
 
     return (
-        <div className="min-h-screen bg-[#f4f6f8] px-8 py-6">
+        <div className="min-h-screen bg-[#F2F5F8] px-8 py-6">
             <div className="mx-auto max-w-[1280px]">
                 <PageHeader
                     title="City Overview"
@@ -38,19 +38,19 @@ export function SupervisorPage() {
                         title="Open issues"
                         value={openCount}
                         change="+11.01%"
-                        bg="bg-[#e9eaf6]"
+                        bg="bg-[#FFFFFF]"
                     />
                     <StatCard
                         title="In Progress"
                         value={inProgressCount}
                         change="-0.03%"
-                        bg="bg-[#e3edf8]"
+                        bg="bg-[#FFFFFF]"
                     />
                     <StatCard
                         title="Resolved"
                         value={resolvedCount}
                         change="+15.03%"
-                        bg="bg-[#ece9f6]"
+                        bg="bg-[#FFFFFF]"
                     />
                 </div>
 
@@ -79,13 +79,13 @@ function StatCard({
     return (
         <div className={`flex items-center justify-between rounded-[20px] px-6 py-6 ${bg}`}>
             <div>
-                <p className="text-[16px] text-[#4b5563]">{title}</p>
-                <p className="mt-2 text-[32px] font-semibold text-[#1f2937]">
+                <p className="text-[16px] text-[#2B2B2B]">{title}</p>
+                <p className="mt-2 text-[32px] font-semibold text-[#202020]">
                     {value}
                 </p>
             </div>
 
-            <div className="flex items-center gap-2 text-[14px] text-[#4b5563]">
+            <div className="flex items-center gap-2 text-[14px] text-[#2E2E5A]">
                 <span>{change}</span>
                 <TrendingUp size={16} />
             </div>

@@ -14,7 +14,7 @@ import reviewDashboard from "../assets/landing/review-dashboard.jpg";
 
 export function HomePage() {
     return (
-        <div className="min-h-screen bg-[#f5f5f5] text-black">
+        <div className="min-h-screen bg-[#F2F5F8] text-[#202020]">
             <header className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-6 py-5 lg:px-10">
                 <div className="flex items-center gap-3">
                     <img src={logo} alt="FixMyCity" className="h-14 w-auto object-contain" />
@@ -60,7 +60,7 @@ export function HomePage() {
 
                         <Link
                             to="/login"
-                            className="mt-6 rounded-full bg-black px-10 py-4 text-sm font-bold uppercase tracking-[0.15em] text-white transition hover:opacity-90"
+                            className="mt-6 rounded-full bg-[#2E2E5A] px-10 py-4 text-sm font-bold uppercase tracking-[0.15em] text-white transition hover:bg-[#202020]"
                         >
                             Report an issue
                         </Link>
@@ -177,7 +177,7 @@ export function HomePage() {
                 </section>
             </main>
 
-            <footer className="mt-20 border-t border-black/10 bg-[#efefef]">
+            <footer className="mt-20 border-t border-[#2B2B2B]/10 bg-[#FFFFFF]">
                 <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-14 lg:grid-cols-4 lg:px-10">
                     <div>
                         <h3 className="text-3xl font-extrabold">FixMyCity</h3>
@@ -191,7 +191,7 @@ export function HomePage() {
                         <p className="mt-10 text-xs text-black/45">Copyright © 2026</p>
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold text-[#3b5cc9]">Navigation</h4>
+                        <h4 className="text-sm font-bold text-[#2E2E5A]">Navigation</h4>
                         <div className="mt-4 space-y-3 text-sm text-black/75">
                             <a href="#home" className="block hover:text-black">Home</a>
                             <Link to ="/login" className="block hover:text-black">Report an issue</Link>
@@ -199,14 +199,14 @@ export function HomePage() {
                         </div>
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold text-[#3b5cc9]">Legal</h4>
+                        <h4 className="text-sm font-bold text-[#2E2E5A]">Legal</h4>
                         <div className="mt-4 space-y-3 text-sm text-black/75">
                             <a href="#" className="block hover:text-black">Terms & Conditions</a>
                             <a href="#" className="block hover:text-black">Privacy Policy</a>
                         </div> 
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold text-[#3b5cc9]">Follow Us</h4>
+                        <h4 className="text-sm font-bold text-[#2E2E5A]">Follow Us</h4>
                         <div className="mt-4 space-y-3 text-sm text-black/75">
                         <a href="#" className="block hover:text-black">Facebook</a>
                         <a href="#" className="block hover:text-black">Twitter</a>

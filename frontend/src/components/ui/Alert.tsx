@@ -38,7 +38,7 @@ function getIcon(variant: AlertVariant) {
 function getIconBg(variant: AlertVariant) {
     switch(variant) {
         case "success":
-            return "bg-[#11c76f] text-white";
+            return "bg-[#000000] text-white";
         case "error":
             return "bg-[#ef4444] text-white";
         case "warning":

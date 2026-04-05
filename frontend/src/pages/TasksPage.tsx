@@ -57,18 +57,18 @@ export function TasksPage() {
             <div className="flex items-center justify-center gap-4 pt-12">
                 <button
                     type="button"
-                    className="rounded-full bg-[#eceae7] px-5 py-2 text-[16px] text-[#555]"
+                    className="rounded-full bg-[#FFFFFF] px-5 py-2 text-[16px] text-[#2B2B2B]"
                 >
                     Previous
                 </button>
                 <button
                     type="button"
-                    className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#e9eef8] text-[16px] font-medium text-[#26457a]"
+                    className="flex h-[40px] w-[40px] items-center justify-center rounded-full bg-[#2E2E5A]/12 text-[16px] font-medium text-[#2E2E5A]"
                 >
                     {page}
                 </button>
 
-                <button type="button" className="text-[16px] text-[#555]">
+                <button type="button" className="text-[16px] text-[#2B2B2B]">
                     Next
                 </button>
             </div>
@@ -78,17 +78,17 @@ export function TasksPage() {
 
 function TaskCard({ task }: { task: Issue }) {
     return (
-        <div className="min-h-[300px] rounded-[24px] border border-[#7a8baa] bg-[#dfe3eb] px-6 py-6">
-            <h2 className="text-center text-[18px] font-bold leading-8 text-[#2f2f2f]">
+        <div className="min-h-[300px] rounded-[24px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-6 py-6">
+            <h2 className="text-center text-[18px] font-bold leading-8 text-[#202020]">
                 {task.title}
             </h2>
 
-            <div className="mt-6 space-y-4 text-[#2f2f2f]">
+            <div className="mt-6 space-y-4 text-[#2B2B2B]">
                 <InfoBlock label="Category:" value={task.category_name ?? "Unknown"} />
 
                 <div>
                     <p className="text-[16px] font-semibold">Status:</p>
-                    <div className="flex items-center gap-2 text-[16px] text-[#454545]">
+                    <div className="flex items-center gap-2 text-[16px] text-[#2B2B2B]">
                         <Circle
                             size={12}
                             fill={getStatusColor(task.status)}
@@ -104,7 +104,7 @@ function TaskCard({ task }: { task: Issue }) {
 
             <Link
                 to={`/issue/${task.id}`}
-                className="mt-8 inline-flex items-center text-[15px] text-[#4a4a4a] hover:underline"
+                className="mt-8 inline-flex items-center text-[15px] text-[#2E2E5A] hover:underline"
             >
                 View Details <span className="ml-1">→</span>
             </Link>
@@ -116,7 +116,7 @@ function InfoBlock({ label, value }: { label: string; value: string }) {
     return (
         <div>
             <p className="text-[16px] font-semibold">{label}</p>
-            <p className="text-[16px] leading-5 text-[#454545]">{value}</p>
+            <p className="text-[16px] leading-5 text-[#2B2B2B]">{value}</p>
         </div>
     );
 }

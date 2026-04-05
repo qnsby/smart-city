@@ -107,11 +107,11 @@ export function ReportIssuePage() {
                             <StaticIssueMap center={mapCenter} selectedCoords={selectedCoords} onMapClick={handleMapClick} />
                             
                             <div className="absolute left-8 top-8 z-[1000]">
-                                <p className="mb-2 text-[20px] font-semibold text-[#3a3a3a]">
+                                <p className="mb-2 text-[20px] font-semibold text-[#202020]">
                                     Location:
                                 </p>
-                                <div className="rounded-[16px] bg-[#4A4A4A] px-4 py-3 shadow-lg backdrop-blur-sm border border-white/60">
-                                    <p className="text-[15px] leading-6 text-[#FFFFFF] break-words">
+                                <div className="rounded-[16px] border border-[#FFFFFF]/60 bg-[#2B2B2B] px-4 py-3 shadow-lg backdrop-blur-sm">
+                                    <p className="break-words text-[15px] leading-6 text-[#FFFFFF]">
                                         {locationLabel}
                                     </p>
                                 </div>
@@ -119,37 +119,37 @@ export function ReportIssuePage() {
                         </div>
                     </div>
                     
-                    <div className="rounded-[20px] border border-[#7186a5] bg-white px-8 py-10 shadow-sm">
+                    <div className="rounded-[20px] border border-[#2B2B2B]/15 bg-[#FFFFFF] px-8 py-10 shadow-sm">
                         <div className="text-center">
-                            <h2 className="text-[22px] font-extrabold uppercase text-[#2f2f2f]">
+                            <h2 className="text-[22px] font-extrabold uppercase text-[#202020]">
                                 REPORT IN ISSUE
                             </h2>
-                            <p className="mx-auto mt-3 max-w-[240px] text-[16px] leading-6 text-[#4b4b4b]">
+                            <p className="mx-auto mt-3 max-w-[240px] text-[16px] leading-6 text-[#2B2B2B]">
                                 Fill in the details and select the problem location
                             </p>
                         </div>
 
                         <form className="mt-10 space-y-5" onSubmit={handleSubmit}>
                             <div>
-                                <label className="mb-2 block text-[16px] text-[#3a3a3a]">
+                                <label className="mb-2 block text-[16px] text-[#202020]">
                                     Title:
                                 </label>
                                 <input
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
                                     placeholder="Issue Title"
-                                    className="h-[48px] w-full rounded-[6px] bg-[#4a4a4a] px-4 text-[16px] text-white placeholder:text-[#d1d1d1] outline-none"
+                                    className="h-[48px] w-full rounded-[6px] bg-[#F0EDFF] px-4 text-[16px] text-[#1C1C1C] placeholder:text-[#1C1C1C] outline-none"
                                 />
                             </div>
                             <div>
-                                <label className="mb-2 block text-[16px] text-[#3a3a3a]">
+                                <label className="mb-2 block text-[16px] text-[#202020]">
                                     Category:
                                 </label>
                                 <div className='relative'>
                                     <select
                                         value={category}
                                         onChange={(e) => setCategory(e.target.value as any)}
-                                        className="h-[48px] w-full rounded-[6px] bg-[#4a4a4a] px-4 text-[16px] text-white placeholder:text-[#d1d1d1] outline-none"
+                                        className="h-[48px] w-full rounded-[6px] bg-[#F0EDFF] px-4 text-[16px] text-[#1C1C1C] placeholder:text-[#1C1C1C] outline-none"
                                     >
                                         <option value="">Select a Category</option>
                                         <option value="road">Road issue</option>
@@ -164,14 +164,14 @@ export function ReportIssuePage() {
                                 </div>
                             </div>
                             <div>
-                                <label className="mb-2 block text-[16px] text-[#3a3a3a]">
+                                <label className="mb-2 block text-[16px] text-[#202020]">
                                     Description:
                                 </label>
                                 <textarea 
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Issue Description..."
-                                    className="h-[140px] w-full resize-none rounded-[6px] bg-[#4a4a4a] px-4 py-3 text-[16px] text-white placeholder:text-[#d1d1d1] outline-none"
+                                    className="h-[140px] w-full resize-none rounded-[6px] bg-[#F0EDFF] px-4 py-3 text-[16px] text-[#1C1C1C] placeholder:text-[#1C1C1C] outline-none"
                                 />
                             </div>
 
@@ -179,7 +179,7 @@ export function ReportIssuePage() {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="h-[44px] w-[180px] rounded-[8px] bg-[#4a4a4a] text-[16px] text-white transition hover:opacity-90"
+                                    className="h-[44px] w-[180px] rounded-[8px] bg-[#2B2B2B] text-[16px] text-white transition hover:bg-[#202020]"
                                 >
                                     Upload Photo
                                 </button>    
@@ -193,7 +193,7 @@ export function ReportIssuePage() {
                             />
 
                             {photo ? (
-                                <p className="text-center text-sm text-[#4a4a4a]">
+                                <p className="text-center text-sm text-[#2B2B2B]">
                                     {photo.name}
                                 </p>
                             ) : null}
@@ -202,7 +202,7 @@ export function ReportIssuePage() {
                                 <button 
                                     type="submit"
                                     disabled={createMutation.isPending}
-                                    className="h-[44px] w-[180px] rounded-[8px] bg-[#12966b] text-[16px] font-medium text-white transition hover:opacity-90"
+                                    className="h-[44px] w-[180px] rounded-[8px] bg-[#2E2E5A] text-[16px] font-medium text-white transition hover:bg-[#202020]"
                                 >
                                     {createMutation.isPending ? "Submitting" : "Submit"}
                                 </button>
@@ -213,22 +213,22 @@ export function ReportIssuePage() {
             </div>
             {showSuccessModal ? (
                 <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/10 px-4">
-                    <div className="relative w-full max-w-[1050px] rounded-[18px] border border-[#ABABAB] bg-white px-8 py-16 shadow-[0_20px_60px_rgba(0,0,0,0.15)] sm:px-14">
+                    <div className="relative w-full max-w-[1050px] rounded-[18px] border border-[#2B2B2B]/20 bg-[#FFFFFF] px-8 py-16 shadow-[0_20px_60px_rgba(32,32,32,0.15)] sm:px-14">
                         <div className="flex flex-col items-center text-center">
-                            <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[#02C173]">
+                            <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-[#000000]">
                                 <Check size={40} className="text-white" strokeWidth={4} />
                             </div>
-                            <h2 className="mt-10 text-[52px] font-medium leading-none text-[#444A59]">
+                            <h2 className="mt-10 text-[52px] font-medium leading-none text-[#000000]">
                                 Thank You!
                             </h2>
-                            <p className="mt-4 text-[20px] text-[#666B78]">
+                            <p className="mt-4 text-[20px] text-[#2B2B2B]">
                                 Your report has been submitted
                             </p>
 
                             <div className="mt-14 flex flex-col items-center gap-5 sm:flex-row">
                                 <Link
                                     to="/myReport"
-                                    className="flex h-[60px] min-w-[240px] items-center justify-center rounded-full bg-[#444A59] px-8 text-[20px] font-medium text-white transition hover:opacity-90"
+                                    className="flex h-[60px] min-w-[240px] items-center justify-center rounded-full bg-[#000000] px-8 text-[20px] font-medium text-white transition hover:bg-[#202020]"
                                 >
                                     View My Reports
                                 </Link>
@@ -236,7 +236,7 @@ export function ReportIssuePage() {
                                 <button 
                                     type="button" 
                                     onClick={() => navigate("/map")}
-                                    className="flex h-[60px] min-w-[240px] items-center justify-center rounded-full border border-[#444A59] bg-white px-8 text-[20px] font-medium text-[#444A59] transition hover:bg-slate-50"
+                                    className="flex h-[60px] min-w-[240px] items-center justify-center rounded-full border border-[#000000] bg-[#FFFFFF] px-8 text-[20px] font-medium text-[#2E2E5A] transition hover:bg-[#F2F5F8]"
                                 >
                                     Back to Dashboard
                                 </button>

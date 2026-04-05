@@ -181,7 +181,7 @@ export function IssueDetailsPage() {
 
   if (query.isLoading) {
     return (
-      <div className="rounded-[24px] bg-[#f4f6f8] p-6">
+      <div className="rounded-[24px] bg-[#F2F5F8] p-6">
         <LoadingSkeleton rows={6} />
       </div>
     );
@@ -198,16 +198,16 @@ export function IssueDetailsPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#f4f6f8] px-8 py-6">
+      <div className="min-h-screen bg-[#F2F5F8] px-8 py-6">
         <div className="mx-auto max-w-[1280px]">
           <PageHeader title={pageTitle} searchValue="" onSearchChange={() => { }} />
 
-          <div className="mt-4 flex items-center gap-3 text-[18px] text-[#a0a0a0]">
-            <Link to={breadcrumbRoot.to} className="transition hover:text-[#6b7280]">
+          <div className="mt-4 flex items-center gap-3 text-[18px] text-[#2B2B2B]/50">
+            <Link to={breadcrumbRoot.to} className="transition hover:text-[#2B2B2B]">
               {breadcrumbRoot.label}
             </Link>
             <span>/</span>
-            <span className="text-[#343434]">{issue.title}</span>
+            <span className="text-[#202020]">{issue.title}</span>
           </div>
 
           
@@ -224,7 +224,7 @@ export function IssueDetailsPage() {
               </div>
 
               <div className="mt-10">
-                <h2 className="text-[24px] font-semibold text-[#2a2a2a]">
+                <h2 className="text-[24px] font-semibold text-[#202020]">
                   Uploaded Evidence
                 </h2>
 
@@ -236,7 +236,7 @@ export function IssueDetailsPage() {
                       className="h-[320px] w-full object-cover"
                     />
                   ) : (
-                    <div className="flex h-[320px] items-center justify-center text-[18px] text-[#8b8b8b]">
+                    <div className="flex h-[320px] items-center justify-center text-[18px] text-[#2B2B2B]/60">
                       No uploaded evidence
                     </div>
                   )}
@@ -256,7 +256,7 @@ export function IssueDetailsPage() {
                       });
                     }}
                     disabled={updateStatusMutation.isPending}
-                    className="inline-flex h-[48px] items-center justify-center rounded-[8px] bg-[#159a6c] px-6 text-[18px] font-semibold text-white shadow-[0_12px_24px_rgba(21,154,108,0.22)] transition hover:bg-[#12875e] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex h-[48px] items-center justify-center rounded-[8px] bg-[#2E2E5A] px-6 text-[18px] font-semibold text-white shadow-[0_12px_24px_rgba(46,46,90,0.22)] transition hover:bg-[#202020] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {updateStatusMutation.isPending ? "Saving..." : "Mark As Done"}
                   </button>
@@ -267,7 +267,7 @@ export function IssueDetailsPage() {
                     <button
                       type="button"
                       onClick={() => setIsEditing(true)}
-                      className="rounded-[10px] border border-[#d7d7d7] bg-white px-5 py-3 text-[18px] font-medium text-[#2e2e2e] shadow-sm transition hover:bg-[#f8f8f8]"
+                      className="rounded-[10px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-5 py-3 text-[18px] font-medium text-[#202020] shadow-sm transition hover:bg-[#F2F5F8]"
                     >
                       Change Ticket
                     </button>
@@ -275,7 +275,7 @@ export function IssueDetailsPage() {
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="rounded-[10px] border border-[#d7d7d7] bg-white px-5 py-3 text-[17px] text-[#4b5563]"
+                      className="rounded-[10px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-5 py-3 text-[17px] text-[#2B2B2B]"
                     >
                       Cancel
                     </button>
@@ -324,8 +324,8 @@ export function IssueDetailsPage() {
                 </FieldShell>
 
                 <div>
-                  <p className="mb-3 text-[16px] font-medium text-[#666]">Issue Description</p>
-                  <div className="rounded-[30px] bg-white px-7 py-7 text-[17px] leading-9 text-[#667085]">
+                  <p className="mb-3 text-[16px] font-medium text-[#2B2B2B]">Issue Description</p>
+                  <div className="rounded-[30px] bg-[#FFFFFF] px-7 py-7 text-[17px] leading-9 text-[#2B2B2B]">
                     {issue.description || "No description provided."}
                   </div>
                 </div>
@@ -337,7 +337,7 @@ export function IssueDetailsPage() {
                         type="button"
                         onClick={handleSave}
                         disabled={updateStatusMutation.isPending}
-                        className="inline-flex h-[56px] w-full max-w-[240px] items-center justify-center rounded-[8px] bg-[#169c6b] px-8 text-[20px] font-semibold text-white shadow-[0_14px_30px_rgba(22,156,107,0.22)] transition hover:bg-[#148a5f] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex h-[46px] w-full max-w-[232px] items-center justify-center rounded-[42px] bg-[#2E2E5A] px-8 text-[20px] font-semibold text-white shadow-[0_14px_30px_rgba(46,46,90,0.22)] transition hover:bg-[#202020] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {updateStatusMutation.isPending ? (
                           <Loader2 className="h-5 w-5 animate-spin" />
@@ -370,7 +370,7 @@ export function IssueDetailsPage() {
 function FieldShell({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <p className="mb-3 text-[16px] font-medium text-[#555]">{label}</p>
+      <p className="mb-3 text-[16px] font-medium text-[#2B2B2B]">{label}</p>
       {children}
     </div>
   );
@@ -378,7 +378,7 @@ function FieldShell({ label, children }: { label: string; children: ReactNode })
 
 function InputLike({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-[58px] items-center rounded-[24px] border border-[#edf2f7] bg-white px-5 text-[18px] text-[#4b5563] shadow-[0_16px_30px_rgba(148,163,184,0.1)]">
+    <div className="flex min-h-[58px] items-center rounded-[24px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-5 text-[18px] text-[#2B2B2B] shadow-[0_16px_30px_rgba(32,32,32,0.08)]">
       {children}
     </div>
   );
@@ -435,12 +435,12 @@ function RoundedSelect({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen((current) => !current)}
-        className="flex h-[60px] w-full items-center justify-between rounded-[24px] border border-[#dbe2ea] bg-white px-5 text-left text-[18px] text-[#334155] shadow-[0_18px_34px_rgba(148,163,184,0.14)] outline-none transition hover:border-[#c7d3e3] hover:bg-[#fcfdff] focus:border-[#1d2b64] focus:ring-4 focus:ring-[#dbe7ff] disabled:cursor-not-allowed disabled:bg-[#f8fafc] disabled:text-[#94a3b8]"
+        className="flex h-[60px] w-full items-center justify-between rounded-[24px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-5 text-left text-[18px] text-[#202020] shadow-[0_18px_34px_rgba(32,32,32,0.12)] outline-none transition hover:border-[#2E2E5A]/30 hover:bg-[#F2F5F8] focus:border-[#2E2E5A] focus:ring-4 focus:ring-[#2E2E5A]/10 disabled:cursor-not-allowed disabled:bg-[#F2F5F8] disabled:text-[#2B2B2B]/40"
       >
         <span className="truncate">{selectedOption?.label || "Select option"}</span>
 
         <span
-          className={`ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f3f6fb] text-[#475569] transition ${isOpen ? "rotate-180 bg-[#e8eefc] text-[#1d2b64]" : ""
+          className={`ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F2F5F8] text-[#2B2B2B] transition ${isOpen ? "rotate-180 bg-[#2E2E5A]/12 text-[#2E2E5A]" : ""
             }`}
         >
           <ChevronDown className="h-5 w-5" />
@@ -448,7 +448,7 @@ function RoundedSelect({
       </button>
 
       {isOpen ? (
-        <div className="absolute left-0 right-0 top-[calc(100%+14px)] z-[1200] overflow-hidden rounded-[26px] border border-[#dbe2ea] bg-white p-3 shadow-[0_28px_60px_rgba(15,23,42,0.18)] backdrop-blur-sm">
+        <div className="absolute left-0 right-0 top-[calc(100%+14px)] z-[1200] overflow-hidden rounded-[26px] border border-[#2B2B2B]/10 bg-[#FFFFFF] p-3 shadow-[0_28px_60px_rgba(32,32,32,0.18)] backdrop-blur-sm">
           <div className="max-h-[260px] overflow-y-auto pr-1">
             <div className="space-y-1">
               {options.map((option) => {
@@ -463,13 +463,13 @@ function RoundedSelect({
                       setIsOpen(false);
                     }}
                     className={`flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left text-[16px] transition ${selected
-                        ? "bg-[#eef4ff] text-[#1d2b64] shadow-[inset_0_0_0_1px_rgba(96,125,255,0.16)]"
-                        : "text-[#475569] hover:bg-[#f8fafc] hover:text-[#0f172a]"
+                        ? "bg-[#2E2E5A]/10 text-[#2E2E5A] shadow-[inset_0_0_0_1px_rgba(46,46,90,0.16)]"
+                        : "text-[#2B2B2B] hover:bg-[#F2F5F8] hover:text-[#202020]"
                       }`}
                   >
                     <span className="pr-3">{option.label}</span>
                     {selected ? (
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1d2b64] shadow-sm">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF] text-[#2E2E5A] shadow-sm">
                         <Check className="h-4 w-4" />
                       </span>
                     ) : null}

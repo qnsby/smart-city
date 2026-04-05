@@ -41,7 +41,7 @@ export function AppShell() {
 
   return (
     <AppShellContext.Provider value={{ collapsed, setCollapsed }}>
-      <div className="min-h-screen bg-[#eef0f3] text-slate-900">
+      <div className="min-h-screen bg-[#F2F5F8] text-[#202020]">
         <div
           className={`grid min-h-screen gap-4 p-4 transition-all duration-300 ${
             collapsed ? "grid-cols-[64px_1fr]" : "grid-cols-[250px_1fr]"
@@ -51,7 +51,7 @@ export function AppShell() {
           className={`relative transition-all duration-300 ${
             collapsed
               ? "bg-transparent p-0 shadow-none"
-              : "rounded-[10px] bg-white p-4 shadow-sm"
+              : "rounded-[10px] bg-[#FFFFFF] p-4 shadow-sm"
           }`}
         >
           {collapsed ? (
@@ -59,7 +59,7 @@ export function AppShell() {
               <button
                 type="button"
                 onClick={() => setCollapsed(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2B2B2B]/15 bg-[#FFFFFF] text-[#2B2B2B] shadow-sm transition hover:bg-[#F2F5F8]"
               >
                 <ChevronLeft size={16} className="rotate-180" />
               </button>
@@ -78,7 +78,7 @@ export function AppShell() {
                 <button
                   type="button"
                   onClick={() => setCollapsed(true)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-600 transition hover:bg-slate-50"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-[#2B2B2B]/15 text-[#2B2B2B] transition hover:bg-[#F2F5F8]"
                 >
                   <ChevronLeft size={16} />
                 </button>
@@ -170,8 +170,8 @@ export function AppShell() {
                 />
               </nav>
 
-              <div className="mt-6 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
-                <div className="font-medium text-slate-700">Signed in as</div>
+              <div className="mt-6 rounded-xl bg-[#F2F5F8] p-3 text-xs text-[#2B2B2B]">
+                <div className="font-medium text-[#202020]">Signed in as</div>
                 <div className="mt-1">
                   {user?.name}
                   <br />
@@ -180,7 +180,7 @@ export function AppShell() {
 
                 <button
                   onClick={logout}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-300 px-3 py-2 text-sm transition hover:bg-slate-100"
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#2B2B2B]/15 px-3 py-2 text-sm transition hover:bg-[#FFFFFF]"
                 >
                   <LogOut size={16} />
                   Logout
@@ -214,12 +214,12 @@ function NavItem({
       className={({ isActive }) =>
         `flex items-center gap-3 rounded-xl px-3 py-3 transition ${
           isActive
-            ? "bg-slate-100 text-slate-900"
-            : "text-slate-600 hover:bg-slate-50"
+            ? "bg-[#F2F5F8] text-[#202020]"
+            : "text-[#2B2B2B] hover:bg-[#FFFFFF]"
         }`
       }
     >
-      <span className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-slate-200 bg-white shadow-sm">
+      <span className="flex h-9 w-9 items-center justify-center rounded-[10px] border border-[#2B2B2B]/10 bg-[#FFFFFF] shadow-sm">
         {icon}
       </span>
       <span className="text-[16px]">{label}</span>

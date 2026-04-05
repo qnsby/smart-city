@@ -39,24 +39,24 @@ export function PageHeader({
         ) : null}
 
         <div>
-          <h1 className="text-[34px] font-extrabold leading-none text-[#222]">
+          <h1 className="text-[34px] font-extrabold leading-none text-[#202020]">
             {title}
           </h1>
           {subtitle ? (
-            <p className="mt-2 text-[18px] text-[#3d3d3d]">{subtitle}</p>
+            <p className="mt-2 text-[18px] text-[#2B2B2B]">{subtitle}</p>
           ) : null}
         </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-4">
         {showSearch ? (
-          <div className="flex h-[54px] w-[560px] max-w-full items-center rounded-[10px] bg-white px-5 shadow-sm">
-            <Search size={20} className="mr-3 text-slate-500" />
+          <div className="flex h-[54px] w-[560px] max-w-full items-center rounded-[10px] bg-[#FFFFFF] px-5 shadow-sm">
+            <Search size={20} className="mr-3 text-[#2B2B2B]/60" />
             <input
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={searchPlaceholder}
-              className="w-full bg-transparent text-[18px] outline-none placeholder:text-slate-500"
+              className="w-full bg-transparent text-[18px] text-[#202020] outline-none placeholder:text-[#2B2B2B]/60"
             />
           </div>
         ) : null}
@@ -66,12 +66,12 @@ export function PageHeader({
         <button
           type="button"
           aria-label="Notifications"
-          className="flex h-[54px] w-[54px] items-center justify-center rounded-[10px] bg-white text-slate-600 shadow-sm"
+          className="flex h-[54px] w-[54px] items-center justify-center rounded-[10px] bg-[#FFFFFF] text-[#2B2B2B] shadow-sm"
         >
           <Bell size={20} />
         </button>
 
-        <div className="flex h-[54px] min-w-[54px] items-center justify-center rounded-full bg-slate-300 px-3 text-slate-700 shadow-sm">
+        <div className="flex h-[54px] min-w-[54px] items-center justify-center rounded-full bg-[#2E2E5A]/12 px-3 text-[#2E2E5A] shadow-sm">
           <User size={22} />
         </div>
       </div>
