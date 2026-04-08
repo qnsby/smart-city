@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
 
 import logo from "../assets/branding/logo.svg";
 
@@ -11,16 +11,17 @@ import reviewMap from "../assets/landing/review-map.jpg";
 import reviewCity from "../assets/landing/review-city.jpg";
 import reviewMonitor from "../assets/landing/review-monitor.jpg";
 import reviewDashboard from "../assets/landing/review-dashboard.jpg";
+import {User} from "lucide-react";
 
 export function HomePage() {
     return (
         <div className="min-h-screen bg-[#F2F5F8] text-[#202020]">
-            <header className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-6 py-5 lg:px-10">
-                <div className="flex items-center gap-3">
-                    <img src={logo} alt="FixMyCity" className="h-14 w-auto object-contain" />
+            <header className="mx-auto flex w-full max-w-[1800px] items-center justify-between px-6 py-4 lg:px-10">
+                <div className="flex items-center gap-1">
+                    <img src={logo} alt="FixMyCity" className="h-20 w-auto object-contain"/>
                 </div>
-                <nav className="hidden items-center gap-10 text-[14px] text-black/80 md:flex">
-                    <a href="#home" className="hover:text-black">
+                <nav className="hidden items-center gap-10 text-[19px] text-black/50 md:flex">
+                    <a href="#home" className="transition hover:text-black">
                         Home
                     </a>
                     <a href="#how-it-works" className="hover:text-black">
@@ -33,9 +34,13 @@ export function HomePage() {
                         Login
                     </Link>
                 </nav>
-                <div className="text-xl text-black/70">◦</div>
+                <div
+                    className="flex h-[54px] min-w-[54px] items-center justify-center rounded-full bg-[#2E2E5A]/12 px-3 text-[#2E2E5A] shadow-sm">
+                    <User size={26}/>
+                </div>
             </header>
-            <main className="mx-auto w-full max-w-[1600px]">
+
+            <main className="mx-auto w-full max-w-[1800px]">
                 <section
                     id="home"
                     className="relative flex flex-col items-center px-6 pb-16 pt-8 text-center lg:px-10"
@@ -45,17 +50,17 @@ export function HomePage() {
                         alt="Smart City issue reporting"
                         className="w-full max-w-[900px] object-contain"
                     />
-                    
+
                     <div className="absolute top-[110px] flex max-w-[780px] flex-col items-center px-4">
                         <h1 className="text-4xl font-extrabold leading-none tracking-tight sm:text-5xl lg:text-[76px]">
                             Smart City Issue
-                            <br />
+                            <br/>
                             Reporting Platform
                         </h1>
-                        <p className="mt-6 max-w-[650px] text-sm leading-6 text-black/75 sm:text-base">
-                            Help improve your city by reporting infrastracture issues with precise
+                        <p className="mt-6 max-w-[650px] text-sm leading-6 text-black/75 sm:text-lg">
+                            Help improve your city by reporting infrastructure issues with precise
                             locations, photos, and descriptions. Track the progress of your reports and
-                            support faster response from municipal services.    
+                            support faster response from municipal services.
                         </p>
 
                         <Link
@@ -68,7 +73,7 @@ export function HomePage() {
                 </section>
 
                 <section className="px-6 py-16 lg:px-10">
-                    <h2 className="text-center text-3xl font-extrabold">What is this platform?</h2>
+                    <h2 className="text-center text-5xl font-extrabold">What is this platform?</h2>
                     <div className="mt-14 grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-4">
                         <FeatureCard
                             title="Report Issues"
@@ -88,88 +93,89 @@ export function HomePage() {
                         />
                     </div>
                 </section>
-                
-                <section id="how-it-works" className="px-6 py-16 lg:px-10">
-                    <h2 className="text-center text-3xl font-extrabold">How it works</h2>
+
+                <section id="how-it-works" className="px-6 py-16 lg:px-10 ">
+                    <h2 className="text-center text-5xl font-extrabold">How it works</h2>
                     <div className="mt-16 flex flex-col items-center justify-center gap-8 lg:flex-row lg:gap-12">
-                        <StepCard image={stepLocation} title="Choose Location" />
+                        <StepCard image={stepLocation} title="Choose Location"/>
                         <div className="text-3xl text-black/70">→</div>
-                        <StepCard image={stepForm} title="Descrive The Problem" />
+                        <StepCard image={stepForm} title="Descrive The Problem"/>
                         <div className="text-3xl text-black/70">→</div>
-                        <StepCard image={stepTrack} title="TitleProgress" />
+                        <StepCard image={stepTrack} title="TitleProgress"/>
                     </div>
                 </section>
 
-                <section id="analytics" className="overflow-x-clip px-6 py-16 lg:px-10">
-                    <h2 className="text-center text-3xl font-extrabold">Our Client Reviews</h2>
+                <section id="analytics" className="overflow-visible px-4 py-16 lg:px-8">
+                    <h2 className="text-center text-5xl font-extrabold">Our Client Reviews</h2>
 
-                    <div className="mt-16 space-y-20">
+                    <div className="mt-20 space-y-20">
                         <div className="grid items-center gap-10 lg:grid-cols-12">
-                            <div className="lg:col-span-5 lg:-translate-x-6">
+                            <div className="lg:col-span-5 lg:col-start-2 lg:translate-y-6 lg:-translate-x-10">
                                 <img
                                     src={reviewMap}
                                     alt="Transparency"
-                                    className="w-full max-w-[420px] rounded-[18px] object-cover shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
+                                    className="w-full max-w-[420px] rounded-[18px] object-cover shadow-[0_30px_60px_rgba(0,0,0,0.20)]"
                                 />
                             </div>
 
                             <div className="lg:col-span-4 lg:col-start-7 lg:-translate-y-3">
                                 <h3 className="text-4xl font-extrabold">Transparency</h3>
-                                <p className="mt-4 text-base leading-7 text-black/70">
+                                <p className="mt-4 text-lg leading-7 text-black/70">
                                     Citizenst can see how issues are processed and track the progress of each report.
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div className="grid items-center gap-10 lg:grid-cols-12">
-                            <div className="lg:col-span-4 lg:col-start-2 lg:translate-y-6 lg:-translate-x-10">
+                            <div className="lg:col-span-4 lg:col-start-3 lg:translate-y-6 lg:-translate-x-10">
                                 <h3 className="text-4xl font-extrabold">Faster Response</h3>
-                                <p className="mt-4 text-base leading-7 text-black/70">
+                                <p className="mt-4 text-lg leading-7 text-black/70">
                                     Automated routing and centralized reporting help city departments respond to
                                     problems more quickly.
                                 </p>
                             </div>
-                            
+
                             <div className="lg:col-span-5 lg:col-start-8 lg:translate-x-12">
                                 <img
                                     src={reviewCity}
                                     alt="Faster Response"
-                                    className="w-full max-w-[420px] rounded-[18px] object-cover shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
+                                    className="w-full max-w-[440px] rounded-[18px] object-cover shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
                                 />
                             </div>
                         </div>
+
                         <div className="grid items-center gap-10 lg:grid-cols-12">
-                            <div className="lg:col-span-5 lg:-translate-x-10">
+                            <div className="lg:col-span-5 lg:col-start-2 lg:translate-y-6 lg:-translate-x-10">
                                 <img
-                                src={reviewMonitor}
-                                alt="Better City Monitoring"
-                                className="w-full max-w-[420px] rounded-[18px] object-cover shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
+                                    src={reviewMonitor}
+                                    alt="Better City Monitoring"
+                                    className="w-full max-w-[430px] rounded-[18px] object-cover shadow-[0_30px_60px_rgba(0,0,0,0.20)]"
                                 />
                             </div>
 
                             <div className="lg:col-span-4 lg:col-start-7 lg:col-start-7 lg:translate-y-2">
                                 <h3 className="text-4xl font-extrabold">Better City Monitoring</h3>
-                                <p className="mt-4 text-base leading-7 text-black/70">
-                                Aggregated data and spatial insights allow authorities to monitor infrastructure
-                                issues across the city.
+                                <p className="mt-4 text-lg leading-7 text-black/70">
+                                    Aggregated data and spatial insights allow authorities to monitor infrastructure
+                                    issues across the city.
                                 </p>
                             </div>
-                            </div>
+                        </div>
 
-                            <div className="grid items-center gap-10 lg:grid-cols-12">
-                            <div className="lg:col-span-4 lg:col-start-2 lg:translate-y-8 lg:-translate-x-8">
+                        <div className="grid items-center gap-10 lg:grid-cols-12">
+                            <div className="lg:col-span-4 lg:col-start-3 lg:translate-y-8 lg:-translate-x-10">
                                 <h3 className="text-4xl font-extrabold">Data-Driven Decisions</h3>
-                                <p className="mt-4 text-base leading-7 text-black/70">
-                                Analytics and statistics help city officials prioritize resources and improve
-                                service efficiency.
+                                <p className="mt-4 text-lg leading-7 text-black/70">
+                                    Analytics and statistics help city officials prioritize resources and improve
+                                    service efficiency.
                                 </p>
                             </div>
 
                             <div className="lg:col-span-5 lg:col-start-8 lg:translate-x-16 lg:translate-y-10">
                                 <img
-                                src={reviewDashboard}
-                                alt="Data-Driven Decisions"
-                                className="w-full max-w-[420px] rounded-[18px] object-cover shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
+                                    src={reviewDashboard}
+                                    alt="Data-Driven Decisions"
+                                    className="w-full max-w-[440px] rounded-[18px] object-cover shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
                                 />
                             </div>
                         </div>
@@ -178,11 +184,11 @@ export function HomePage() {
             </main>
 
             <footer className="mt-20 border-t border-[#2B2B2B]/10 bg-[#FFFFFF]">
-                <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-6 py-14 lg:grid-cols-4 lg:px-10">
+                <div className="mx-auto grid w-full max-w-[1540px] gap-40 px-6 py-14 lg:grid-cols-4 lg:px-10">
                     <div>
                         <h3 className="text-3xl font-extrabold">FixMyCity</h3>
-                        <p className="mt-4 max-w-[320px] text-sm leading-6 text-black/70">
-                            The Smart City Issue Reporting Platform enables 
+                        <p className="mt-4 max-w-[320px] text-base leading-6 text-black/70">
+                            The Smart City Issue Reporting Platform enables
                             citizens to report urban infrastructure problems
                             and helps municipal authorities manage and analyze
                             issues more efficiently through centralized workflows
@@ -191,27 +197,27 @@ export function HomePage() {
                         <p className="mt-10 text-xs text-black/45">Copyright © 2026</p>
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold text-[#2E2E5A]">Navigation</h4>
-                        <div className="mt-4 space-y-3 text-sm text-black/75">
+                        <h4 className="text-base font-bold text-[#2E2E5A]">Navigation</h4>
+                        <div className="mt-4 space-y-3 text-base text-black/75">
                             <a href="#home" className="block hover:text-black">Home</a>
-                            <Link to ="/login" className="block hover:text-black">Report an issue</Link>
-                            <Link to="/map" className="block hover:text-black">My reports</Link>    
+                            <Link to="/login" className="block hover:text-black">Report an issue</Link>
+                            <Link to="/map" className="block hover:text-black">My reports</Link>
                         </div>
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold text-[#2E2E5A]">Legal</h4>
-                        <div className="mt-4 space-y-3 text-sm text-black/75">
+                        <h4 className="text-base font-bold text-[#2E2E5A]">Legal</h4>
+                        <div className="mt-4 space-y-3 text-base text-black/75">
                             <a href="#" className="block hover:text-black">Terms & Conditions</a>
                             <a href="#" className="block hover:text-black">Privacy Policy</a>
-                        </div> 
+                        </div>
                     </div>
                     <div>
-                        <h4 className="text-sm font-bold text-[#2E2E5A]">Follow Us</h4>
-                        <div className="mt-4 space-y-3 text-sm text-black/75">
-                        <a href="#" className="block hover:text-black">Facebook</a>
-                        <a href="#" className="block hover:text-black">Twitter</a>
-                        <a href="#" className="block hover:text-black">Instagram</a>
-                        </div>    
+                        <h4 className="text-base font-bold text-[#2E2E5A]">Follow Us</h4>
+                        <div className="mt-4 space-y-3 text-base text-black/75">
+                            <a href="#" className="block hover:text-black">Facebook</a>
+                            <a href="#" className="block hover:text-black">Twitter</a>
+                            <a href="#" className="block hover:text-black">Instagram</a>
+                        </div>
 
                     </div>
                 </div>
@@ -220,28 +226,33 @@ export function HomePage() {
     );
 }
 
-function FeatureCard({ title, text }: { title:string; text:string }) {
+function FeatureCard({title, text}: { title: string; text: string }) {
     return (
         <div className="min-w-0 text-left">
-            <h3 className="text-[20px] font-bold">{title}</h3>
-            <p className="m-3 text-sm leading-6 text-black/65">{text}</p>
+            <h3 className="text-[24px] font-bold">{title}</h3>
+            <p className="m-3 text-lg leading-6 text-black/65">{text}</p>
         </div>
     );
 }
 
-function StepCard({ image, title}: { image: string; title: string}){
+function StepCard({image, title}: { image: string; title: string }) {
     return (
         <div className="flex w-[180px] flex-col items-center text-center">
-            <img src={image} alt={title} className="h-[140px] w-auto object-contain" />
-            <p className="mt-4 text-lg font-semibold">{title} </p>
+            <img src={image} alt={title} className="h-[200px] w-auto object-contain"/>
+            <p className="mt-4 text-xl font-semibold">{title} </p>
         </div>
     )
 }
 
-function ReviewRow({image, title, text, imageLeft = false }: { image:string; title:string; text:string; imageLeft?:boolean;}){
+function ReviewRow({image, title, text, imageLeft = false}: {
+    image: string;
+    title: string;
+    text: string;
+    imageLeft?: boolean;
+}) {
     return (
         <div className="grid items-center gap-10 lg:grid-cols-2">
-            {imageLeft? (
+            {imageLeft ? (
                 <>
                     <div className="flex justify-start">
                         <img
@@ -250,7 +261,7 @@ function ReviewRow({image, title, text, imageLeft = false }: { image:string; tit
                             className="w-full max-w-[500px] rounded-[18px] object-cover shadow-[0_18px_40px_rgba(0,0,0,0.12)]"
                         />
                     </div>
-                    
+
                     <div className="max-w-[420px] text-left">
                         <h3 className="text-4xl font-extrabold">{title}</h3>
                         <p className="mt-5 text-base leading-7 text-black/70">{text}</p>
@@ -262,7 +273,7 @@ function ReviewRow({image, title, text, imageLeft = false }: { image:string; tit
                         <h3 className="text-4xl font-extrabold">{title}</h3>
                         <p className="mt-5 text-base leading-7 text-black/70">{text}</p>
                     </div>
-                    
+
                     <div className="flex justify-end">
                         <img
                             src={image}
