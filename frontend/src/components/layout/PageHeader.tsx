@@ -48,7 +48,7 @@ export function PageHeader({
                 </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-end gap-4">
+            <div className="flex flex-wrap items-center justify-centre gap-3">
                 {showSearch ? (
                     <div
                         className="flex h-[54px] w-[560px] max-w-full items-center rounded-[10px] bg-[#FFFFFF] px-5 shadow-sm">
@@ -73,7 +73,7 @@ export function PageHeader({
                 </button>
 
                 <div
-                    className="flex h-[54px] min-w-[54px] items-center justify-center rounded-full bg-[#2E2E5A]/12 px-3 text-[#2E2E5A] shadow-sm">
+                    className="flex h-[54px] min-w-[54px] items-center justify-center rounded-[10px] bg-[#FFFFFF] text-[#2B2B2B] shadow-sm">
                     <User size={22}/>
                 </div>
             </div>

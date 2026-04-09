@@ -102,7 +102,7 @@ export function ReportIssuePage() {
                     subtitle="Mark the problem on the map and send the full report to the city team."
                 />
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_370px]">
-                    <div className="rounded-[28px] bg-white shadow-sm overflow-hidden">
+                    <div className="h-[620px] rounded-[28px] bg-white shadow-sm overflow-hidden">
                         <div className="relative">
                             <StaticIssueMap center={mapCenter} selectedCoords={selectedCoords} onMapClick={handleMapClick} />
                             
