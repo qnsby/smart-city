@@ -7,6 +7,7 @@ import { IssueReportModal } from "../components/map/IssueReportModal";
 import { IssuesMap } from "../components/map/IssuesMap";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
 import type { Issue } from "../types";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_LIMIT = 50;
 
@@ -29,6 +30,8 @@ export function DashboardPage() {
     placeholderData: (prev) => prev
   });
   const items = useMemo(() => query.data?.items ?? [], [query.data?.items]);
+
+  const navigate = useNavigate();
 
   const recentReports = useMemo(
     () => items.filter((i) => i.status !== "RESOLVED").slice(0, 4),
@@ -61,13 +64,13 @@ export function DashboardPage() {
 
         <div className="flex flex-col gap-6">
           <button
-            onClick={() => setIsReportOpen(true)}
+            onClick={() => navigate("/reportIssue")}
             className="h-[50px] w-[197px] rounded-[15px] border border-[#2B2B2B]/15 bg-[#FFFFFF] text-[16px] font-medium text-[#202020] shadow-sm transition hover:bg-[#F2F5F8]"
           >
             Create New Report
           </button>
 
-          <div className="flex h-[246px] w-[197px] flex-col rounded-[16px] border border-[#2B2B2B]/15 bg-[#FFFFFF] p-4 shadow-sm">
+          <div className="flex h-[260px] w-[197px] flex-col rounded-[16px] border border-[#2B2B2B]/15 bg-[#FFFFFF] p-4 shadow-sm">
             <h2 className="text-[16px] font-semibold text-[#202020]">Recent reports</h2>
 
             <div className="mt-4 flex-1 space-y-3 overflow-y-auto pr-1 text-[14px] text-[#2B2B2B]">
@@ -79,7 +82,7 @@ export function DashboardPage() {
             </div>
 
             <Link
-              to="/admin/issues"
+              to="/myReport"
               className="mt-4 inline-flex items-center text-[13px] text-[#2E2E5A] hover:underline"
             >
               View More <span className="ml-1">-</span>

@@ -102,9 +102,15 @@ export function AnalyticsPage() {
                 />
                 <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-4">
                     <MetricCard
-                        title="Totla Tickets"
+                        title="Total Tickets"
                         value={metrics.total}
                         change="+11.01%"
+                        bgClass="bg-[#FFFFFF]"
+                    />
+                    <MetricCard
+                        title="Resolved"
+                        value={metrics.resolved}
+                        change="15.03%"
                         bgClass="bg-[#FFFFFF]"
                     />
                     <MetricCard

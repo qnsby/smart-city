@@ -51,7 +51,7 @@ export function PageHeader({
             <div className="flex flex-wrap items-center justify-end gap-4">
                 {showSearch ? (
                     <div
-                        className="flex h-[54px] w-[560px] max-w-full items-center rounded-[10px] bg-[#FFFFFF] px-5 shadow-sm">
+                        className="flex h-[54px] w-[540px] max-w-full items-center rounded-[10px] bg-[#FFFFFF] px-5 shadow-sm">
                         <Search size={20} className="mr-3 text-[#2B2B2B]/60"/>
                         <input
                             value={searchValue}

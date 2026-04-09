@@ -151,7 +151,7 @@ export function AppShell() {
                 
                 {canAnalytics ? (
                   <NavItem
-                    to="/analytics/dashboard"
+                    to="/analyticsDashboard"
                     label="Dashboard"
                     icon={<LayoutDashboard size={18} />}
                   />
