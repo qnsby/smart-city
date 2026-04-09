@@ -114,7 +114,7 @@ export function HomePage() {
                                 <img
                                     src={reviewMap}
                                     alt="Transparency"
-                                    className="w-full max-w-[420px] rounded-[18px] object-cover shadow-[0_30px_60px_rgba(0,0,0,0.20)]"
+                                    className="w-full max-w-[420px] rounded-[18px] object-cover shadow-[0_50px_80px_rgba(0,0,0,0.30)]"
                                 />
                             </div>
 
@@ -149,7 +149,7 @@ export function HomePage() {
                                 <img
                                     src={reviewMonitor}
                                     alt="Better City Monitoring"
-                                    className="w-full max-w-[430px] rounded-[18px] object-cover shadow-[0_30px_60px_rgba(0,0,0,0.20)]"
+                                    className="w-full max-w-[430px] rounded-[18px] object-cover shadow-[0_50px_80px_rgba(0,0,0,0.30)]"
                                 />
                             </div>
 
