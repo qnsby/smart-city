@@ -89,7 +89,7 @@ const router = createBrowserRouter([
       {
         element: <AppShell />,
         children: [
-          {path: "/analytics/dashboard", element: <SupervisorPage />},
+          {path: "/analyticsDashboard", element: <SupervisorPage />},
           {path: "/analytics", element: <AnalyticsPage />}
         ]
       }

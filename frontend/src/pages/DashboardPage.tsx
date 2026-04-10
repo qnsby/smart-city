@@ -1,12 +1,13 @@
-import {useMemo, useState} from "react";
-import {useQuery, useQueryClient} from "@tanstack/react-query";
-import {Link} from "react-router-dom";
-import {listIssuesApi} from "../api/issues";
-import {PageHeader} from "../components/layout/PageHeader";
-import {IssueReportModal} from "../components/map/IssueReportModal";
-import {IssuesMap} from "../components/map/IssuesMap";
-import {LoadingSkeleton} from "../components/ui/LoadingSkeleton";
-import type {Issue} from "../types";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+import { listIssuesApi } from "../api/issues";
+import { PageHeader } from "../components/layout/PageHeader";
+import { IssueReportModal } from "../components/map/IssueReportModal";
+import { IssuesMap } from "../components/map/IssuesMap";
+import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
+import type { Issue } from "../types";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_LIMIT = 50;
 
@@ -80,15 +81,15 @@ export function DashboardPage() {
                             )}
                         </div>
 
-                        <Link
-                            to="/admin/issues"
-                            className="mt-4 inline-flex items-center text-[13px] text-[#2E2E5A] hover:underline"
-                        >
-                            View More <span className="ml-1">&rarr;</span>
-                        </Link>
-                    </div>
-                </div>
-            </div>
+            <Link
+              to="/myReport"
+              className="mt-4 inline-flex items-center text-[13px] text-[#2E2E5A] hover:underline"
+            >
+              View More <span className="ml-1">-</span>
+            </Link>
+          </div>
+        </div>
+      </div>
 
             <IssueReportModal
                 open={isReportOpen}

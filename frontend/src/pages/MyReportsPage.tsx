@@ -87,7 +87,7 @@ function ReportCard({ report }: { report: Issue }) {
                 <InfoBlock label="Created date:" value={formatDate(report.created_at)} />
                 <InfoBlock
                     label="Assigned Department:"
-                    value={report.assigned_department_id ?? "Not assigned"}
+                    value={report.assigned_department_name ?? "Not assigned"}
                 />
             </div>
 
