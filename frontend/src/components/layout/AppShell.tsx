@@ -44,7 +44,7 @@ export function AppShell() {
       <div className="min-h-screen bg-[#F2F5F8] text-[#202020]">
         <div
           className={`grid min-h-screen gap-4 p-4 transition-all duration-300 ${
-            collapsed ? "grid-cols-[64px_1fr]" : "grid-cols-[250px_1fr]"
+              collapsed ? "grid-cols-[70px_1fr]" : "grid-cols-[300px_1fr]"
           }`}
         >
         <aside
@@ -66,12 +66,12 @@ export function AppShell() {
             </div>
           ) : (
             <>
-              <div className="flex items-start justify-between">
+              <div className="flex items-center justify-between">
                 <Link to="/dashboard" className="flex justify-center">
                   <img
                     src={logo}
                     alt="FixMyCity logo"
-                    className="h-12 w-auto"
+                    className="h-[64px] w-auto object-contain"
                   />
                 </Link>
 
@@ -91,7 +91,7 @@ export function AppShell() {
                     label="Dashboard"
                     icon={<LayoutDashboard size={18} />}
                   />
-                ) : null}  
+                ) : null}
 
                 {canCreate ? (
                   <NavItem
@@ -148,7 +148,7 @@ export function AppShell() {
                     icon={<ClipboardList size={18} />}
                   />
                 ) : null}
-                
+
                 {canAnalytics ? (
                   <NavItem
                     to="/analyticsDashboard"
