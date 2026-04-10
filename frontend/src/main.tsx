@@ -23,6 +23,7 @@ import { OperatorPage } from "./pages/OperatorPage";
 import { TasksPage } from "./pages/TasksPage";
 import { SupervisorPage } from "./pages/SupervisorPage";
 import { AnalyticsPage } from "./pages/AnalyticsPage";
+import { ProfileSettingsPage } from "./pages/ProfileSettingsPage";
 
 async function enableMocks() {
   if (!USE_MSW) return;
@@ -43,7 +44,8 @@ const router = createBrowserRouter([
           { path: "/dashboard", element: <DashboardPage /> },
           { path: "/issue/:id", element: <IssueDetailsPage /> },
           { path: "/reportIssue", element: <ReportIssuePage /> },
-          { path: "/myReport", element: <MyReportPage /> }
+          { path: "/myReport", element: <MyReportPage /> },
+          { path: "/profile/settings", element: <ProfileSettingsPage /> }
         ]
       }
     ]
@@ -78,7 +80,7 @@ const router = createBrowserRouter([
       {
         element: <AppShell />,
         children: [
-          { path: "/tasks", element: <TasksPage />}
+          { path: "/tasks", element: <TasksPage /> }
         ]
       }
     ]
@@ -89,8 +91,8 @@ const router = createBrowserRouter([
       {
         element: <AppShell />,
         children: [
-          {path: "/analyticsDashboard", element: <SupervisorPage />},
-          {path: "/analytics", element: <AnalyticsPage />}
+          { path: "/analyticsDashboard", element: <SupervisorPage /> },
+          { path: "/analytics", element: <AnalyticsPage /> }
         ]
       }
     ]

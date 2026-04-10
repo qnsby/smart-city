@@ -1,13 +1,14 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import { Check, ChevronDown, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { getIssueApi, listDepartmentsApi, updateIssueApi } from "../api/issues";
 import { PageHeader } from "../components/layout/PageHeader";
 import { StaticIssueMap } from "../components/map/IssuesMap";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
 import { ActionAlert } from "../components/ui/Alert";
+import { RoundedSelect } from "../components/ui/RoundedSelect";
 import type { DepartmentOption, IssueStatus } from "../types";
 import { canManageWorkflow } from "../utils/roles";
 import { useAuth } from "../auth/AuthProvider";
@@ -380,106 +381,6 @@ function InputLike({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-[58px] items-center rounded-[24px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-5 text-[18px] text-[#2B2B2B] shadow-[0_16px_30px_rgba(32,32,32,0.08)]">
       {children}
-    </div>
-  );
-}
-
-function RoundedSelect({
-  value,
-  onChange,
-  options,
-  disabled
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  options: Array<{ value: string; label: string }>;
-  disabled?: boolean;
-}) {
-  const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const selectedOption = options.find((option) => option.value === value) || options[0];
-
-  useEffect(() => {
-    if (disabled && isOpen) {
-      setIsOpen(false);
-    }
-  }, [disabled, isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return undefined;
-
-    const handlePointerDown = (event: MouseEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener("mousedown", handlePointerDown);
-    window.addEventListener("keydown", handleEscape);
-
-    return () => {
-      window.removeEventListener("mousedown", handlePointerDown);
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, [isOpen]);
-
-  return (
-    <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        disabled={disabled}
-        onClick={() => setIsOpen((current) => !current)}
-        className="flex h-[60px] w-full items-center justify-between rounded-[24px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-5 text-left text-[18px] text-[#202020] shadow-[0_18px_34px_rgba(32,32,32,0.12)] outline-none transition hover:border-[#2E2E5A]/30 hover:bg-[#F2F5F8] focus:border-[#2E2E5A] focus:ring-4 focus:ring-[#2E2E5A]/10 disabled:cursor-not-allowed disabled:bg-[#F2F5F8] disabled:text-[#2B2B2B]/40"
-      >
-        <span className="truncate">{selectedOption?.label || "Select option"}</span>
-
-        <span
-          className={`ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F2F5F8] text-[#2B2B2B] transition ${isOpen ? "rotate-180 bg-[#2E2E5A]/12 text-[#2E2E5A]" : ""
-            }`}
-        >
-          <ChevronDown className="h-5 w-5" />
-        </span>
-      </button>
-
-      {isOpen ? (
-        <div className="absolute left-0 right-0 top-[calc(100%+14px)] z-[1200] overflow-hidden rounded-[26px] border border-[#2B2B2B]/10 bg-[#FFFFFF] p-3 shadow-[0_28px_60px_rgba(32,32,32,0.18)] backdrop-blur-sm">
-          <div className="max-h-[260px] overflow-y-auto pr-1">
-            <div className="space-y-1">
-              {options.map((option) => {
-                const selected = option.value === value;
-
-                return (
-                  <button
-                    key={option.value || "empty"}
-                    type="button"
-                    onClick={() => {
-                      onChange(option.value);
-                      setIsOpen(false);
-                    }}
-                    className={`flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left text-[16px] transition ${selected
-                        ? "bg-[#2E2E5A]/10 text-[#2E2E5A] shadow-[inset_0_0_0_1px_rgba(46,46,90,0.16)]"
-                        : "text-[#2B2B2B] hover:bg-[#F2F5F8] hover:text-[#202020]"
-                      }`}
-                  >
-                    <span className="pr-3">{option.label}</span>
-                    {selected ? (
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#FFFFFF] text-[#2E2E5A] shadow-sm">
-                        <Check className="h-4 w-4" />
-                      </span>
-                    ) : null}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

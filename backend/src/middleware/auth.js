@@ -24,7 +24,11 @@ async function authRequired(req, res, next) {
     req.user = {
       id: user.id,
       name: user.name,
+      first_name: user.firstName,
+      surname: user.surname,
       email: user.email,
+      phone_number: user.phoneNumber,
+      address: user.address,
       department_id: user.departmentId,
       department_code: user.department?.code || null,
       role: normalizeRole(user.role)

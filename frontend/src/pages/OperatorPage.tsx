@@ -126,7 +126,7 @@ export function OperatorPage() {
                         <div className="overflow-x-auto">
                             <table className="w-full min-w-[900px] border-separate border-spacing-y-0 text-left">
                                 <thead>
-                                    <tr className="bg-[#F2F5F8] text-[17px] text-[#2E2E5A]">
+                                    <tr className="bg-[#2E2E5A] text-[17px] text-[#FFFFFF]">
                                         <th className="rounded-l-[8px] px-7 py-4 font-medium">Ticket ID</th>
                                         <th className="px-7 py-5 font-medium">Title</th>
                                         <th className="px-7 py-5 font-medium">Category</th>
@@ -145,7 +145,7 @@ export function OperatorPage() {
                                                 onClick={() => handleRowClick(issue.id)}
                                                 onDoubleClick={() => handleRowDoubleClick(issue.id)}
                                                 className={`cursor-pointer text[16px] text-[#2B2B2B] transition ${
-                                                    isSelected ? "bg-[#2E2E5A]/10" : striped ? "bg-[#F2F5F8]" : "bg-[#FFFFFF]"
+                                                    isSelected ? "bg-[#017CB31A]/10" : striped ? "bg-[#FFFFFF]" : "bg-[#FFFFFF]"
                                                 }`}
                                             >
                                                 <td className="px-7 py-5">{issue.id}</td>

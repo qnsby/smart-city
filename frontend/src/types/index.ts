@@ -22,6 +22,10 @@ export interface User {
   email: string;
   role: Role;
   department_id: string | null;
+  first_name: string | null;
+  surname: string | null;
+  phone_number: string | null;
+  address: string | null;
 }
 
 export interface AuditEntry {
@@ -109,7 +113,7 @@ export interface H3AnalyticsCell {
 
 export interface AuthLoginResponse {
   token: string;
-  user?: Partial<User> & { id?: string; name?: string; role?: string; department_id?: string | null };
+  user?: Partial<User> & { id?: string; name?: string; role?: string; department_id?: string | null; first_name?: string | null };
 }
 
 export interface RegisterPayload {

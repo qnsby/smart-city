@@ -45,7 +45,11 @@ const authController = {
       user: {
         id: user.id,
         name: user.name,
+        first_name: user.firstName,
+        surname: user.surname,
         email: user.email,
+        phone_number: user.phoneNumber,
+        address: user.address,
         role,
         department_id: user.departmentId,
         department_code: user.department?.code || null
@@ -92,14 +96,28 @@ const authController = {
 
     console.log(`[AUTH] Registration success: ${name} (${role})`);
     return res.status(201).json({
-      user: { id: user.id, name, email: normalizedEmail, role, department_id: null }
+      user: {
+        id: user.id,
+        name,
+        first_name: user.firstName,
+        surname: user.surname,
+        email: normalizedEmail,
+        phone_number: user.phoneNumber,
+        address: user.address,
+        role,
+        department_id: null
+      }
     });
   },
   me(req, res) {
     return res.json({
       id: req.user.id,
       name: req.user.name,
+      first_name: req.user.first_name,
+      surname: req.user.surname,
       email: req.user.email,
+      phone_number: req.user.phone_number,
+      address: req.user.address,
       role: req.user.role,
       department_id: req.user.department_id,
       department_code: req.user.department_code || null

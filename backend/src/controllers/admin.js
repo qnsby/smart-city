@@ -14,7 +14,11 @@ const adminController = {
     const items = result.map((user) => ({
       id: user.id,
       name: user.name,
+      first_name: user.firstName,
+      surname: user.surname,
       email: user.email,
+      phone_number: user.phoneNumber,
+      address: user.address,
       department_id: user.departmentId,
       department_code: user.department?.code || null,
       role: normalizeRole(user.role)
@@ -85,7 +89,11 @@ const adminController = {
     return res.json({
       id: updated.id,
       name: updated.name,
+      first_name: updated.firstName,
+      surname: updated.surname,
       email: updated.email,
+      phone_number: updated.phoneNumber,
+      address: updated.address,
       role: normalizeRole(updated.role),
       department_id: updated.departmentId,
       department_code: updated.department?.code || null

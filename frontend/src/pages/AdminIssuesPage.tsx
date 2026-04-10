@@ -5,6 +5,7 @@ import { useAuth } from "../auth/AuthProvider";
 import { PageHeader } from "../components/layout/PageHeader";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
+import { RoundedSelect } from "../components/ui/RoundedSelect";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import { useToast } from "../components/ui/ToastProvider";
 import type { Issue, IssueFilters, IssueStatus, PaginatedResponse } from "../types";
@@ -75,40 +76,42 @@ export function AdminIssuesPage() {
               value={filters.q || ""}
               onChange={(e) => setFilters((prev) => ({ ...prev, q: e.target.value, page: 1 }))}
             />
-            <select
-              className="input"
+            <RoundedSelect
               value={filters.status || ""}
-              onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value as never, page: 1 }))}
-            >
-              <option value="">All statuses</option>
-              <option value="OPEN">OPEN</option>
-              <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="RESOLVED">RESOLVED</option>
-            </select>
-            <select
-              className="input"
+              onChange={(nextStatus) => setFilters((prev) => ({ ...prev, status: nextStatus as never, page: 1 }))}
+              options={[
+                { value: "", label: "All statuses" },
+                { value: "OPEN", label: "OPEN" },
+                { value: "IN_PROGRESS", label: "IN_PROGRESS" },
+                { value: "RESOLVED", label: "RESOLVED" }
+              ]}
+              size="sm"
+            />
+            <RoundedSelect
               value={filters.category || ""}
-              onChange={(e) => setFilters((prev) => ({ ...prev, category: e.target.value as never, page: 1 }))}
-            >
-              <option value="">All categories</option>
-              <option value="road">road</option>
-              <option value="water">water</option>
-              <option value="lighting">lighting</option>
-              <option value="waste">waste</option>
-              <option value="safety">safety</option>
-              <option value="other">other</option>
-            </select>
-            <select
-              className="input"
-              value={filters.limit || 10}
-              onChange={(e) => setFilters((prev) => ({ ...prev, limit: Number(e.target.value), page: 1 }))}
-            >
-              {[10, 20, 50].map((n) => (
-                <option key={n} value={n}>
-                  {n} / page
-                </option>
-              ))}
-            </select>
+              onChange={(nextCategory) =>
+                setFilters((prev) => ({ ...prev, category: nextCategory as never, page: 1 }))
+              }
+              options={[
+                { value: "", label: "All categories" },
+                { value: "road", label: "road" },
+                { value: "water", label: "water" },
+                { value: "lighting", label: "lighting" },
+                { value: "waste", label: "waste" },
+                { value: "safety", label: "safety" },
+                { value: "other", label: "other" }
+              ]}
+              size="sm"
+            />
+            <RoundedSelect
+              value={String(filters.limit || 10)}
+              onChange={(nextLimit) => setFilters((prev) => ({ ...prev, limit: Number(nextLimit), page: 1 }))}
+              options={[10, 20, 50].map((n) => ({
+                value: String(n),
+                label: `${n} / page`
+              }))}
+              size="sm"
+            />
           </div>
         </div>
       </section>
@@ -120,7 +123,7 @@ export function AdminIssuesPage() {
           <EmptyState title="No issues" description="No issues match the selected filters." />
         ) : (
           <>
-            <div className="overflow-auto">
+            <div className="overflow-x-auto overflow-y-visible">
               <table className="w-full min-w-[880px] text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-left text-slate-500">
@@ -147,17 +150,19 @@ export function AdminIssuesPage() {
                       <td className="py-2 pr-3">{formatDateTime(issue.created_at)}</td>
                       <td className="py-2 pr-3">
                         {canUpdateStatus ? (
-                          <select
-                            className="rounded-lg border border-slate-300 px-2 py-1 text-xs"
+                          <RoundedSelect
                             value={issue.status}
-                            onChange={(e) =>
-                              mutation.mutate({ id: issue.id, status: e.target.value as IssueStatus })
+                            onChange={(nextStatus) =>
+                              mutation.mutate({ id: issue.id, status: nextStatus as IssueStatus })
                             }
-                          >
-                            <option value="OPEN">OPEN</option>
-                            <option value="IN_PROGRESS">IN_PROGRESS</option>
-                            <option value="RESOLVED">RESOLVED</option>
-                          </select>
+                            options={[
+                              { value: "OPEN", label: "OPEN" },
+                              { value: "IN_PROGRESS", label: "IN_PROGRESS" },
+                              { value: "RESOLVED", label: "RESOLVED" }
+                            ]}
+                            size="sm"
+                            className="w-[160px]"
+                          />
                         ) : (
                           <span className="text-xs text-slate-500">View only</span>
                         )}

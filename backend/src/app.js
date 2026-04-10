@@ -12,6 +12,7 @@ const { authRouter } = require("./routes/auth");
 const { ticketsRouter } = require("./routes/tickets");
 const { analyticsRouter } = require("./routes/analytics");
 const { adminRouter } = require("./routes/admin");
+const { userRouter } = require("./routes/user");
 require("./events/handlers");
 
 const app = express();
@@ -54,6 +55,7 @@ app.use("/auth", authRouter);
 app.use("/tickets", ticketsRouter);
 app.use("/analytics", analyticsRouter);
 app.use("/admin", adminRouter);
+app.use("/users", userRouter);
 
 app.use((req, res) => {
   console.warn(`[WARN] Route not found: ${req.method} ${req.originalUrl}`);

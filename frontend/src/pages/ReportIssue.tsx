@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown } from "lucide-react";
 import { PageHeader } from "../components/layout/PageHeader";
 import { StaticIssueMap } from "../components/map/IssuesMap";
 import { useMutation } from "@tanstack/react-query";
 import { createIssueApi } from "../api/issues"
 import { Link, useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
+import { RoundedSelect } from "../components/ui/RoundedSelect";
 
 export function ReportIssuePage() {
     const [title, setTitle] = useState("");
@@ -145,23 +145,23 @@ export function ReportIssuePage() {
                                 <label className="mb-2 block text-[16px] text-[#202020]">
                                     Category:
                                 </label>
-                                <div className='relative'>
-                                    <select
-                                        value={category}
-                                        onChange={(e) => setCategory(e.target.value as any)}
-                                        className="h-[48px] w-full rounded-[6px] bg-[#F0EDFF] px-4 text-[16px] text-[#1C1C1C] placeholder:text-[#1C1C1C] outline-none"
-                                    >
-                                        <option value="">Select a Category</option>
-                                        <option value="road">Road issue</option>
-                                        <option value="lighting">Streetlight</option>
-                                        <option value="waste">Waste</option>
-                                        <option value="water">Water leak</option>
-                                    </select>
-                                    <ChevronDown
-                                        size={18}
-                                        className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white"
-                                    />
-                                </div>
+                                <RoundedSelect
+                                    value={category}
+                                    onChange={(nextCategory) => setCategory(nextCategory as any)}
+                                    placeholder="Select a Category"
+                                    options={[
+                                        { value: "", label: "Select a Category" },
+                                        { value: "road", label: "Road issue" },
+                                        { value: "lighting", label: "Streetlight" },
+                                        { value: "waste", label: "Waste" },
+                                        { value: "water", label: "Water leak" },
+                                        { value: "safety", label: "Safety" },
+                                        { value: "other", label: "Other" }
+                                    ]}
+                                    size="sm"
+                                    buttonClassName="h-[48px] rounded-[6px] border-0 bg-[#F0EDFF] px-4 text-[16px] text-[#1C1C1C] shadow-none hover:bg-[#E7E2FF] focus:bg-[#F0EDFF]"
+                                    menuClassName="rounded-[16px]"
+                                />
                             </div>
                             <div>
                                 <label className="mb-2 block text-[16px] text-[#202020]">

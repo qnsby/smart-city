@@ -41,7 +41,11 @@ model Department {
 model User {
   id             String              @id @default(uuid())
   name           String              @unique
+  firstName      String?             @map("first_name")
+  surname        String?
   email          String              @unique
+  phoneNumber    String?             @map("phone_number")
+  address        String?
   role           Role
   departmentId   String?             @map("department_id")
   passwordHash   String              @map("password_hash")

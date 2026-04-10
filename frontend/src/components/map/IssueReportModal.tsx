@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { createIssueApi } from "../../api/issues";
 import type { CreateIssuePayload, Issue, IssueCategory } from "../../types";
+import { RoundedSelect } from "../ui/RoundedSelect";
 import { useToast } from "../ui/ToastProvider";
 import type { ReactNode } from "react";
 
@@ -43,6 +44,7 @@ export function IssueReportModal({
     handleSubmit,
     reset,
     setValue,
+    control,
     formState: { errors }
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -109,14 +111,27 @@ export function IssueReportModal({
             <textarea className="input min-h-24" {...register("description")} placeholder="Add details..." />
           </Field>
           <Field label="Category" error={errors.category?.message}>
-            <select className="input" {...register("category")}>
-              <option value="road">Road</option>
-              <option value="water">Water</option>
-              <option value="lighting">Lighting</option>
-              <option value="waste">Waste</option>
-              <option value="safety">Safety</option>
-              <option value="other">Other</option>
-            </select>
+            <Controller
+              control={control}
+              name="category"
+              render={({ field }) => (
+                <RoundedSelect
+                  value={field.value}
+                  onChange={(nextCategory) => field.onChange(nextCategory as IssueCategory)}
+                  options={[
+                    { value: "road", label: "Road" },
+                    { value: "water", label: "Water" },
+                    { value: "lighting", label: "Lighting" },
+                    { value: "waste", label: "Waste" },
+                    { value: "safety", label: "Safety" },
+                    { value: "other", label: "Other" }
+                  ]}
+                  size="sm"
+                  buttonClassName="h-11 rounded-xl shadow-none"
+                  menuClassName="rounded-xl"
+                />
+              )}
+            />
           </Field>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Latitude" error={errors.lat?.message as string | undefined}>

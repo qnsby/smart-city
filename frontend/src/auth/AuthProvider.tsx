@@ -99,7 +99,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
         name: result.user.name,
         email: result.user.email || "",
         role: normalizeRole(result.user.role),
-        department_id: result.user.department_id ?? null
+        department_id: result.user.department_id ?? null,
+        first_name: result.user.first_name ?? null,
+        surname: null,
+        address: null,
+        phone_number: null
       });
       return;
     }

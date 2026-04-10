@@ -18,6 +18,7 @@ import { useAuth } from "../auth/AuthProvider";
 import { PageHeader } from "../components/layout/PageHeader";
 import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
+import { RoundedSelect } from "../components/ui/RoundedSelect";
 
 const pieColors = ["#f59e0b", "#0ea5e9", "#10b981", "#64748b", "#ef4444"];
 
@@ -64,25 +65,28 @@ export function AdminDashboardPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <select className="input" value={status} onChange={(e) => setStatus(e.target.value as never)}>
-              <option value="">All statuses</option>
-              <option value="OPEN">OPEN</option>
-              <option value="IN_PROGRESS">IN_PROGRESS</option>
-              <option value="RESOLVED">RESOLVED</option>
-            </select>
+            <RoundedSelect
+              value={status}
+              onChange={(nextStatus) => setStatus(nextStatus as never)}
+              options={[
+                { value: "", label: "All statuses" },
+                { value: "OPEN", label: "OPEN" },
+                { value: "IN_PROGRESS", label: "IN_PROGRESS" },
+                { value: "RESOLVED", label: "RESOLVED" }
+              ]}
+              size="sm"
+            />
             <input className="input" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
             <input className="input" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-            <select
-              className="input"
-              value={resolution}
-              onChange={(e) => setResolution(Number(e.target.value))}
-            >
-              {[6, 7, 8, 9].map((r) => (
-                <option key={r} value={r}>
-                  H3 r{r}
-                </option>
-              ))}
-            </select>
+            <RoundedSelect
+              value={String(resolution)}
+              onChange={(nextResolution) => setResolution(Number(nextResolution))}
+              options={[6, 7, 8, 9].map((r) => ({
+                value: String(r),
+                label: `H3 r${r}`
+              }))}
+              size="sm"
+            />
           </div>
         </div>
       </section>
