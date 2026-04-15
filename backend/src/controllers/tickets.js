@@ -5,20 +5,13 @@ const { uploadTicketPhoto, createSignedPhotoUrl } = require("../lib/supabase");
 
 const resolution = Number(process.env.H3_RESOLUTION || 9);
 const allowedStatuses = ["NEW", "IN_PROGRESS", "DONE", "REJECTED"];
-const categoryAliases = {
-  ROAD: "road",
-  WATER: "water",
-  LIGHT: "lighting",
-  LIGHTING: "lighting",
-  TRASH: "waste",
-  WASTE: "waste",
-  SAFETY: "safety",
-  OTHER: "other"
-};
 
 const ticketInclude = {
   category: true,
   assignedDepartment: true,
+  assignedTo: {
+    select: { id: true, name: true }
+  },
   attachments: {
     orderBy: { createdAt: "asc" },
     take: 1
@@ -83,7 +76,8 @@ async function serializeTicket(ticket) {
     assigned_department_name: ticket.assignedDepartment?.name || null,
     assigned_team: ticket.assignedDepartment?.code || null,
 
-    assigned_to: ticket.assigned_to,
+    assigned_to: ticket.assignedToId || null,
+    assigned_to_name: ticket.assignedTo?.name || null,
 
     photo_url: photoUrl,
 
@@ -164,7 +158,7 @@ const ticketsController = {
     const h3 = req.query.h3 ? String(req.query.h3) : null;
     const q = req.query.q ? String(req.query.q).trim() : "";
     const category = req.query.category ? String(req.query.category).trim().toUpperCase() : "";
-    const from = req.query.from ? String(req.query.from).trim() : "";
+    const from = req.query.from ? String(req.query.from).rim() : "";
     const to = req.query.to ? String(req.query.to).trim() : "";
     const page = Math.max(1, Number(req.query.page || 1));
     const limit = Math.min(100, Math.max(1, Number(req.query.limit || 20)));
@@ -321,7 +315,7 @@ const ticketsController = {
     const assignedToInputProvided = Object.prototype.hasOwnProperty.call(req.body || {}, "assigned_to");
 
 
-    if (!nextStatus && !departmentInputProvided) {
+    if (!nextStatus && !departmentInputProvided && !assignedToInputProvided) {
       warn(req, "updateTicketStatus missing editable fields", { body: req.body || null });
       return res.status(400).json({ error: "Nothing to update" });
     }
@@ -333,7 +327,7 @@ const ticketsController = {
 
     const ticket = await prisma.ticket.findUnique({
       where: { id: req.params.id },
-      select: { id: true, status: true, assignedDepartmentId: true, createdById: true }
+      select: { id: true, status: true, assignedDepartmentId: true, assignedToId: true, createdById: true }
     });
     if (!ticket) {
       warn(req, "updateTicketStatus not found", { ticketId: req.params.id });
@@ -396,7 +390,7 @@ const ticketsController = {
     const isStatusChanged = Boolean(nextStatus) && nextStatus !== ticket.status;
     const isDepartmentChanged = departmentInputProvided && nextDepartmentId !== ticket.assignedDepartmentId;
 
-    if (!isStatusChanged && !isDepartmentChanged) {
+    if (!isStatusChanged && !isDepartmentChanged && !isAssignedToChanged) {
       const current = await prisma.ticket.findUnique({
         where: { id: req.params.id },
         include: ticketInclude
@@ -464,14 +458,14 @@ const ticketsController = {
     if (isAssignedToChanged) {
       transactionSteps.push(
         prisma.auditLog.create({
-          data:{
+          data: {
             userId: req.user.id,
             action: "ASSIGNED_TO_UPDATED",
             entityType: "TICKET",
             entityId: req.params.id,
             meta: {
               from_user_id: ticket.assignedToId,
-              to_user_id: nextAssignedToId``
+              to_user_id: nextAssignedToId
             }
           }
         })

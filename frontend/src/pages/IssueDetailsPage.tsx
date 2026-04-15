@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { listUsersApi } from "../api/admin";
 import { getIssueApi, listDepartmentsApi, updateIssueApi } from "../api/issues";
 import { PageHeader } from "../components/layout/PageHeader";
 import { StaticIssueMap } from "../components/map/IssuesMap";
@@ -9,7 +10,7 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
 import { ActionAlert } from "../components/ui/Alert";
 import { RoundedSelect } from "../components/ui/RoundedSelect";
-import type { DepartmentOption, IssueStatus } from "../types";
+import type { DepartmentOption, IssueStatus, WorkerOption } from "../types";
 import { canManageWorkflow } from "../utils/roles";
 import { useAuth } from "../auth/AuthProvider";
 import { getIssuePageTitle, getIssuePageBreadcrumbRoot } from "../utils/issuePageMeta"
@@ -73,6 +74,11 @@ export function IssueDetailsPage() {
     queryFn: listDepartmentsApi,
     enabled: canEditDepartment
   });
+  const workersQuery = useQuery({
+    queryKey: ["users"],
+    queryFn: listUsersApi,
+    enabled: canEditDepartment
+  });
 
   const issue = query.data ?? null;
   const [isEditing, setIsEditing] = useState(false);
@@ -91,6 +97,10 @@ export function IssueDetailsPage() {
   useEffect(() => {
     setDraftDepartmentId(issue?.assigned_department_id ?? "");
   }, [issue?.assigned_department_id]);
+
+  useEffect(() => {
+    setDraftAssignedTo(issue?.assigned_to ?? "");
+  }, [issue?.assigned_to]);
 
   const updateStatusMutation = useMutation({
     mutationFn: (payload: { status?: IssueStatus; assigned_department_id?: string | null, assigned_to?: string | null }) =>
@@ -122,6 +132,26 @@ export function IssueDetailsPage() {
     if (!draftDepartmentId) return "Not assigned";
     return departmentOptions.find((department) => department.id === draftDepartmentId)?.name || departmentLabel;
   }, [departmentLabel, departmentOptions, draftDepartmentId]);
+
+  const workerOptions = useMemo<WorkerOption[]>(() => {
+    const data = workersQuery.data;
+    if (!data) return [];
+    const users = Array.isArray(data) ? data : data.items ?? [];
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name
+    }));
+  }, [workersQuery.data]);
+
+  const draftWorkerLabel = useMemo(() => {
+    if (!draftAssignedToId) return "Not assigned";
+    return workerOptions.find((worker) => worker.id === draftAssignedToId)?.name || "Not assigned";
+  }, [draftAssignedToId, workerOptions]);
+
+  const workerLabel = useMemo(() => {
+    if (!issue) return "Not assigned";
+    return issue.assigned_to_name || issue.assigned_to || "Not assigned";
+  }, [issue]);
 
   const successAlertConfig = useMemo(() => {
     if (successAlertMode === "field_worker_done") {
@@ -162,7 +192,7 @@ export function IssueDetailsPage() {
     const hasDepartmentChanged = draftDepartmentId !== (issue.assigned_department_id ?? "");
     const hasAssignedChanged = draftAssignedToId !== (issue.assigned_to ?? "")
 
-    if (!hasStatusChanged && !hasDepartmentChanged) {
+    if (!hasStatusChanged && !hasDepartmentChanged && !hasAssignedChanged) {
       setIsEditing(false);
       return;
     }
@@ -179,6 +209,7 @@ export function IssueDetailsPage() {
     if (issue) {
       setDraftStatus(issue.status);
       setDraftDepartmentId(issue.assigned_department_id ?? "");
+      setDraftAssignedTo(issue.assigned_to ?? "");
     }
     setIsEditing(false);
   };
@@ -214,7 +245,7 @@ export function IssueDetailsPage() {
             <span className="text-[#202020]">{issue.title}</span>
           </div>
 
-          
+
 
           <div className="mt-10 grid grid-cols-1 gap-10 xl:grid-cols-[1fr_520px]">
             <div className="relative z-0">
@@ -251,7 +282,7 @@ export function IssueDetailsPage() {
             <aside className="relative z-10">
               {isFieldWorker ? (
                 <div className="mb-6 flex">
-                  <button 
+                  <button
                     type="button"
                     onClick={() => {
                       setSuccessAlertMode("field_worker_done");
@@ -326,8 +357,24 @@ export function IssueDetailsPage() {
                 <FieldShell label="Category">
                   <InputLike>{categoryLabel}</InputLike>
                 </FieldShell>
+
                 <FieldShell label="Worker">
-                  <InputLike>***Placeholder***</InputLike>
+                  {isEditing && canEditDepartment ? (
+                    <RoundedSelect
+                      value={draftAssignedToId}
+                      onChange={setDraftAssignedTo}
+                      options={[
+                        { value: "", label: "Not assigned" },
+                        ...workerOptions.map((worker) => ({
+                          value: worker.id,
+                          label: worker.name
+                        }))
+                      ]}
+                      disabled={workersQuery.isLoading}
+                    />
+                  ) : (
+                    <InputLike>{isEditing ? draftAssignedToId : workerLabel}</InputLike>
+                  )}
                 </FieldShell>
 
                 <div>

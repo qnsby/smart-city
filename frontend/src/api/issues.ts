@@ -22,6 +22,7 @@ interface BackendTicket {
   assigned_department_name?: string | null;
   photo_url?: string | null;
   assigned_to?: string | null;
+  assigned_to_name?: string | null;
 }
 
 interface BackendTicketListResponse {
@@ -81,7 +82,9 @@ function mapTicketToIssue(ticket: BackendTicket): Issue {
     assigned_department_id: ticket.assigned_department_id ?? null,
     assigned_department_code: ticket.assigned_department_code ?? null,
     assigned_department_name: ticket.assigned_department_name ?? null,
-    photo_url: ticket.photo_url ?? null
+    photo_url: ticket.photo_url ?? null,
+    assigned_to: ticket.assigned_to ?? null,
+    assigned_to_name: ticket.assigned_to_name ?? null
   };
 }
 
@@ -148,11 +151,11 @@ export async function createIssueApi(payload: CreateIssuePayload) {
   formData.append("latitude", String(payload.lat));
   formData.append("longitude", String(payload.lng));
 
-  if(payload.photo) {
-    formData.append("photo",payload.photo);
+  if (payload.photo) {
+    formData.append("photo", payload.photo);
   }
 
-  const { data } = await apiClient.post<BackendTicket>("/tickets/create",formData,{
+  const { data } = await apiClient.post<BackendTicket>("/tickets/create", formData, {
     headers: {
       "Content-Type": "multipart/form-data"
     }

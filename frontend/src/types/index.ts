@@ -49,6 +49,11 @@ export interface DepartmentOption {
   name: string;
 }
 
+export interface WorkerOption {
+  id: string,
+  name: string
+}
+
 export interface Issue {
   id: string;
   title: string;
@@ -65,10 +70,12 @@ export interface Issue {
   created_at: string;
   updated_at: string;
   created_by: string;
-  
+
   assigned_department_id: string | null;
   assigned_department_code?: string | null;
   assigned_department_name?: string | null;
+  assigned_to?: string | null;
+  assigned_to_name?: string | null;
 
   photo_url?: string | null;
   distance_km?: number;
