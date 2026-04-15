@@ -28,10 +28,11 @@ export function TasksPage() {
     const tasks = useMemo(() => {
         const items = query.data?.items ?? [];
         return items.filter((item) => {
-            if (item.status !== "IN_PROGRESS") return false;
-            if (!user?.department_id) return false;
-            return item.assigned_department_id === user.department_id;
+            if(user?.role === "citizen") return false;
+            console.log(item.assigned_to + " " + user?.id)
+            return item.assigned_to === user?.id;
         });
+
     }, [query.data?.items, user?.department_id])
 
     return (

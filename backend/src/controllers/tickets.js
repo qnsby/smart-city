@@ -112,12 +112,13 @@ function mapFilterStatus(status) {
 
 function canViewTicket(user, ticket) {
   if (!user || !ticket) return false;
+  console.log(ticket.assignedToId + " " + user.id)
   if (user.role === "SUPERADMIN" || user.role === "CITY_SUPERVISOR" || user.role === "OPERATOR" || user.role === "DEPARTMENT_ADMIN") {
     return true;
   }
   if (user.role === "CITIZEN") return ticket.createdById === user.id;
   if (user.role === "FIELD_WORKER") {
-    return Boolean(ticket.assignedDepartmentId) && ticket.assignedDepartmentId === user.department_id;
+    return Boolean(ticket.assignedToId) && ticket.assignedToId === user.id;
   }
   return false;
 }
@@ -126,7 +127,7 @@ function canUpdateTicket(user, ticket) {
   if (!user || !ticket) return false;
   if (user.role === "SUPERADMIN") return true;
   if (user.role === "FIELD_WORKER") {
-    return Boolean(ticket.assignedDepartmentId) && ticket.assignedDepartmentId === user.department_id;
+    return Boolean(ticket.assignedToId) && ticket.assignedToId === user.id;
   }
   return user.role === "OPERATOR" || user.role === "DEPARTMENT_ADMIN";
 }
@@ -167,7 +168,6 @@ const ticketsController = {
 
     if (h3) where.h3Index = h3;
     if (req.user.role === "CITIZEN") where.createdById = req.user.id;
-    if (req.user.role === "FIELD_WORKER") where.assignedDepartmentId = req.user.department_id;
     if (category) {
       where.category = {
         code: category === "LIGHTING" ? "LIGHT" : category === "WASTE" ? "TRASH" : category
@@ -499,7 +499,7 @@ const ticketsController = {
   async getAuditLogs(req, res) {
     const ticket = await prisma.ticket.findUnique({
       where: { id: req.params.id },
-      select: { id: true, createdById: true }
+      include: ticketInclude
     });
     if (!ticket) {
       warn(req, "getAuditLogs not found", { ticketId: req.params.id });
