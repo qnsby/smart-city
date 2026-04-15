@@ -83,8 +83,10 @@ async function serializeTicket(ticket) {
     assigned_department_name: ticket.assignedDepartment?.name || null,
     assigned_team: ticket.assignedDepartment?.code || null,
 
+    assigned_to: ticket.assigned_to,
+
     photo_url: photoUrl,
-    
+
     comments: ticket.comments?.map((comment) => ({
       id: comment.id,
       author: comment.author?.name || null,
@@ -313,9 +315,11 @@ const ticketsController = {
   },
 
   async updateTicketStatus(req, res) {
-    const { status, comment, assigned_department_id } = req.body || {};
+    const { status, comment, assigned_department_id, assigned_to } = req.body || {};
     const nextStatus = status == null || status === "" ? null : String(status).trim().toUpperCase();
     const departmentInputProvided = Object.prototype.hasOwnProperty.call(req.body || {}, "assigned_department_id");
+    const assignedToInputProvided = Object.prototype.hasOwnProperty.call(req.body || {}, "assigned_to");
+
 
     if (!nextStatus && !departmentInputProvided) {
       warn(req, "updateTicketStatus missing editable fields", { body: req.body || null });
@@ -370,6 +374,25 @@ const ticketsController = {
       }
     }
 
+    let nextAssignedToId = null;
+    if (assignedToInputProvided) {
+      if (assigned_to === null || assigned_to === "") {
+        nextAssignedToId = null;
+      } else {
+        const user = await prisma.user.findUnique({
+          where: { id: String(assigned_to) },
+          select: { id: true }
+        })
+
+        if (!user) {
+          return res.status(400).json({ error: "User not found" })
+        }
+
+        nextAssignedToId = user.id;
+      }
+    }
+
+    const isAssignedToChanged = assignedToInputProvided && nextAssignedToId !== ticket.assignedToId;
     const isStatusChanged = Boolean(nextStatus) && nextStatus !== ticket.status;
     const isDepartmentChanged = departmentInputProvided && nextDepartmentId !== ticket.assignedDepartmentId;
 
@@ -389,7 +412,8 @@ const ticketsController = {
           resolvedAt: isStatusChanged
             ? (nextStatus === "DONE" ? new Date() : null)
             : undefined,
-          assignedDepartmentId: isDepartmentChanged ? nextDepartmentId : undefined
+          assignedDepartmentId: isDepartmentChanged ? nextDepartmentId : undefined,
+          assignedToId: isAssignedToChanged ? nextAssignedToId : undefined,
         }
       })
     ];
@@ -435,6 +459,23 @@ const ticketsController = {
           }
         })
       );
+    }
+
+    if (isAssignedToChanged) {
+      transactionSteps.push(
+        prisma.auditLog.create({
+          data:{
+            userId: req.user.id,
+            action: "ASSIGNED_TO_UPDATED",
+            entityType: "TICKET",
+            entityId: req.params.id,
+            meta: {
+              from_user_id: ticket.assignedToId,
+              to_user_id: nextAssignedToId``
+            }
+          }
+        })
+      )
     }
 
     await prisma.$transaction(transactionSteps);

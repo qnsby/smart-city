@@ -115,22 +115,6 @@ export function AppShell() {
                     />
                   ) : null}
 
-                  {canAnalytics ? (
-                    <NavItem
-                      to="/admin/dashboard"
-                      label="Admin Dashboard"
-                      icon={<Shield size={18} />}
-                    />
-                  ) : null}
-
-                  {isAdmin ? (
-                    <NavItem
-                      to="/admin/issues"
-                      label="Admin Issues"
-                      icon={<ListChecks size={18} />}
-                    />
-                  ) : null}
-
                   {canUsers ? (
                     <NavItem
                       to="/admin/users"

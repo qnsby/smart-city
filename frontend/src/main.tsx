@@ -12,8 +12,6 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { HomePage } from "./pages/HomePage";
 import { IssueDetailsPage } from "./pages/IssueDetailsPage";
-import { AdminDashboardPage } from "./pages/AdminDashboardPage";
-import { AdminIssuesPage } from "./pages/AdminIssuesPage";
 import { AdminUsersPage } from "./pages/AdminUsersPage";
 import { USE_MSW } from "./utils/constants";
 import "./index.css";
@@ -56,7 +54,6 @@ const router = createBrowserRouter([
       {
         element: <AppShell />,
         children: [
-          { path: "/admin/dashboard", element: <AdminDashboardPage /> },
           { path: "/admin/users", element: <AdminUsersPage /> }
         ]
       }
@@ -68,7 +65,6 @@ const router = createBrowserRouter([
       {
         element: <AppShell />,
         children: [
-          { path: "/admin/issues", element: <AdminIssuesPage /> },
           { path: "/operator", element: <OperatorPage /> }
         ]
       }

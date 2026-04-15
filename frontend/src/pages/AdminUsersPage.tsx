@@ -169,7 +169,7 @@ export function AdminUsersPage() {
                         return (
                           <>
                             <td className="px-4 py-2 pr-3 font-medium">{user.name}</td>
-                            <td className="py-2 pr-3">number</td>
+                            <td className="py-2 pr-3">{user.phone_number}</td>
                             <td className="py-2 pr-3">
                               <RoundedSelect
                                 value={draft.role}

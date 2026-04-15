@@ -73,7 +73,7 @@ export function RoundedSelect({
         disabled={disabled}
         onClick={() => setIsOpen((current) => !current)}
         className={clsx(
-          "flex w-full items-center justify-between border border-[#2B2B2B]/10 bg-[#FFFFFF] text-left text-[#202020] outline-none transition hover:border-[#2E2E5A]/30 hover:bg-[#F2F5F8] focus:border-[#2E2E5A] focus:ring-4 focus:ring-[#2E2E5A]/10 disabled:cursor-not-allowed",
+          "flex w-full items-center justify-between border border-[#2B2B2B]/10 bg-[#F0EDFF] text-left text-[#202020] outline-none transition hover:border-[#2E2E5A]/30 hover:bg-[#F2F5F8] focus:border-[#2E2E5A] focus:ring-4 focus:ring-[#2E2E5A]/10 disabled:cursor-not-allowed",
           size === "sm"
             ? "h-[42px] rounded-[14px] px-3 text-sm shadow-[0_10px_24px_rgba(32,32,32,0.08)]"
             : "h-[60px] rounded-[24px] px-5 text-[18px] shadow-[0_18px_34px_rgba(32,32,32,0.12)]",

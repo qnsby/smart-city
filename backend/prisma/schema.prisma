@@ -7,22 +7,6 @@ datasource db {
   url      = env("SUPABASE_DB_URL")
 }
 
-enum Role {
-  CITIZEN
-  OPERATOR
-  DEPARTMENT_ADMIN
-  FIELD_WORKER
-  CITY_SUPERVISOR
-  SUPERADMIN
-}
-
-enum TicketStatus {
-  NEW
-  IN_PROGRESS
-  DONE
-  REJECTED
-}
-
 model Department {
   id          String           @id @default(uuid())
   code        String           @unique
@@ -31,47 +15,48 @@ model Department {
   isActive    Boolean          @default(true) @map("is_active")
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
-  users       User[]
   categories  TicketCategory[]
   tickets     Ticket[]
+  users       User[]
 
   @@map("departments")
 }
 
 model User {
-  id             String              @id @default(uuid())
-  name           String              @unique
-  firstName      String?             @map("first_name")
-  surname        String?
-  email          String              @unique
-  phoneNumber    String?             @map("phone_number")
-  address        String?
-  role           Role
-  departmentId   String?             @map("department_id")
-  passwordHash   String              @map("password_hash")
-  createdAt      DateTime            @default(now()) @map("created_at")
-  updatedAt      DateTime            @updatedAt @map("updated_at")
-  department     Department?         @relation(fields: [departmentId], references: [id], onDelete: SetNull)
-  tickets        Ticket[]            @relation("TicketCreator")
-  comments       TicketComment[]
-  auditLogs      AuditLog[]
-  statusChanges  TicketStatusHistory[]
-  attachments    TicketAttachment[]
+  id              String                @id @default(uuid())
+  name            String                @unique
+  email           String                @unique
+  role            Role
+  departmentId    String?               @map("department_id")
+  passwordHash    String                @map("password_hash")
+  createdAt       DateTime              @default(now()) @map("created_at")
+  updatedAt       DateTime              @updatedAt @map("updated_at")
+  address         String?
+  firstName       String?               @map("first_name")
+  phoneNumber     String?               @map("phone_number")
+  surname         String?
+  auditLogs       AuditLog[]
+  attachments     TicketAttachment[]
+  comments        TicketComment[]
+  statusChanges   TicketStatusHistory[]
+  tickets         Ticket[]              @relation("TicketCreator")
+  department      Department?           @relation(fields: [departmentId], references: [id])
+  assignedTickets Ticket[]              @relation("TicketAssigned")
 
   @@index([departmentId])
   @@map("users")
 }
 
 model TicketCategory {
-  id           String      @id @default(uuid())
-  code         String      @unique
+  id           String     @id @default(uuid())
+  code         String     @unique
   name         String
   description  String?
-  departmentId String      @map("department_id")
-  isActive     Boolean     @default(true) @map("is_active")
-  createdAt    DateTime    @default(now()) @map("created_at")
-  updatedAt    DateTime    @updatedAt @map("updated_at")
-  department   Department  @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  departmentId String     @map("department_id")
+  isActive     Boolean    @default(true) @map("is_active")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  department   Department @relation(fields: [departmentId], references: [id])
   tickets      Ticket[]
 
   @@index([departmentId])
@@ -92,12 +77,14 @@ model Ticket {
   createdAt            DateTime              @default(now()) @map("created_at")
   updatedAt            DateTime              @updatedAt @map("updated_at")
   resolvedAt           DateTime?             @map("resolved_at")
-  createdBy            User                  @relation("TicketCreator", fields: [createdById], references: [id], onDelete: Cascade)
-  assignedDepartment   Department?           @relation(fields: [assignedDepartmentId], references: [id], onDelete: SetNull)
-  category             TicketCategory        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  comments             TicketComment[]
   attachments          TicketAttachment[]
+  comments             TicketComment[]
   statusHistory        TicketStatusHistory[]
+  assignedDepartment   Department?           @relation(fields: [assignedDepartmentId], references: [id])
+  category             TicketCategory        @relation(fields: [categoryId], references: [id])
+  createdBy            User                  @relation("TicketCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  assignedToId         String?               @map("assigned_to_id")
+  assignedTo           User?                 @relation("TicketAssigned", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   @@index([createdById])
   @@index([assignedDepartmentId])
@@ -107,14 +94,14 @@ model Ticket {
 }
 
 model TicketComment {
-  id          String   @id @default(uuid())
-  ticketId    String   @map("ticket_id")
-  authorUserId String  @map("author_user_id")
-  message     String
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  author      User     @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+  id           String   @id @default(uuid())
+  ticketId     String   @map("ticket_id")
+  authorUserId String   @map("author_user_id")
+  message      String
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  author       User     @relation(fields: [authorUserId], references: [id], onDelete: Cascade)
+  ticket       Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   @@index([ticketId])
   @@index([authorUserId])
@@ -122,15 +109,15 @@ model TicketComment {
 }
 
 model TicketAttachment {
-  id          String   @id @default(uuid())
-  ticketId    String   @map("ticket_id")
-  storagePath String   @map("storage_path")
-  mimeType    String?  @map("mime_type")
-  size        Int?
-  uploadedById String? @map("uploaded_by_id")
-  createdAt   DateTime @default(now()) @map("created_at")
-  ticket      Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  uploadedBy  User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  id           String   @id @default(uuid())
+  ticketId     String   @map("ticket_id")
+  storagePath  String   @map("storage_path")
+  mimeType     String?  @map("mime_type")
+  size         Int?
+  uploadedById String?  @map("uploaded_by_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  ticket       Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  uploadedBy   User?    @relation(fields: [uploadedById], references: [id])
 
   @@index([ticketId])
   @@index([uploadedById])
@@ -138,15 +125,15 @@ model TicketAttachment {
 }
 
 model TicketStatusHistory {
-  id            String       @id @default(uuid())
-  ticketId      String       @map("ticket_id")
-  fromStatus    TicketStatus? @map("from_status")
-  toStatus      TicketStatus @map("to_status")
-  changedById   String       @map("changed_by_id")
-  comment       String?
-  createdAt     DateTime     @default(now()) @map("created_at")
-  ticket        Ticket       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  changedBy     User         @relation(fields: [changedById], references: [id], onDelete: Cascade)
+  id          String        @id @default(uuid())
+  ticketId    String        @map("ticket_id")
+  fromStatus  TicketStatus? @map("from_status")
+  toStatus    TicketStatus  @map("to_status")
+  changedById String        @map("changed_by_id")
+  comment     String?
+  createdAt   DateTime      @default(now()) @map("created_at")
+  changedBy   User          @relation(fields: [changedById], references: [id], onDelete: Cascade)
+  ticket      Ticket        @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   @@index([ticketId])
   @@index([changedById])
@@ -168,10 +155,26 @@ model AuditLog {
 }
 
 model H3Aggregate {
-  h3Index     String   @map("h3_index")
+  h3Index     String @map("h3_index")
   date        String
-  ticketCount Int      @default(0) @map("ticket_count")
+  ticketCount Int    @default(0) @map("ticket_count")
 
   @@id([h3Index, date])
   @@map("h3_aggregates")
+}
+
+enum Role {
+  CITIZEN
+  OPERATOR
+  DEPARTMENT_ADMIN
+  FIELD_WORKER
+  CITY_SUPERVISOR
+  SUPERADMIN
+}
+
+enum TicketStatus {
+  NEW
+  IN_PROGRESS
+  DONE
+  REJECTED
 }

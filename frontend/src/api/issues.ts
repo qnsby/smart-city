@@ -21,6 +21,7 @@ interface BackendTicket {
   assigned_department_code?: string | null;
   assigned_department_name?: string | null;
   photo_url?: string | null;
+  assigned_to?: string | null;
 }
 
 interface BackendTicketListResponse {
@@ -169,15 +170,18 @@ export async function updateIssueStatusApi(id: string, status: Issue["status"]) 
 
 export async function updateIssueApi(
   id: string,
-  payload: { status?: Issue["status"]; assigned_department_id?: string | null }
+  payload: { status?: Issue["status"]; assigned_department_id?: string | null; assigned_to?: string | null }
 ) {
-  const body: { status?: BackendTicketStatus; assigned_department_id?: string | null } = {};
+  const body: { status?: BackendTicketStatus; assigned_department_id?: string | null, assigned_to?: string | null } = {};
 
   if (payload.status !== undefined) {
     body.status = toBackendStatus(payload.status);
   }
   if (payload.assigned_department_id !== undefined) {
     body.assigned_department_id = payload.assigned_department_id;
+  }
+  if (payload.assigned_to !== undefined) {
+    body.assigned_to = payload.assigned_to
   }
 
   const { data } = await apiClient.put<BackendTicket>(`/tickets/update/${id}`, body);

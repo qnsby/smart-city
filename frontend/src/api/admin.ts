@@ -10,6 +10,10 @@ interface AdminUsersResponse {
     email: string;
     role: string;
     department_id: string | null;
+    phone_number: string | null;
+    first_name: string | null;
+    surname: string | null;
+    address: string | null;
   }>;
 }
 
@@ -19,7 +23,11 @@ function toUser(payload: AdminUsersResponse["items"][number]): User {
     name: payload.name,
     email: payload.email,
     role: normalizeRole(payload.role),
-    department_id: payload.department_id ?? null
+    department_id: payload.department_id ?? null,
+    phone_number: payload.phone_number,
+    first_name: payload.first_name,
+    surname: payload.surname,
+    address: payload.address,
   };
 }
 
@@ -59,6 +67,10 @@ export async function updateUserApi(
     email: string;
     role: string;
     department_id: string | null;
+    first_name: string | null;
+    surname: string | null;
+    address: string | null;
+    phone_number: string | null;
   }>(`/admin/users/${id}`, body);
 
   return toUser(data);

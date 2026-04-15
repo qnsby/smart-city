@@ -80,6 +80,7 @@ export function IssueDetailsPage() {
   const [successAlertMode, setSuccessAlertMode] = useState<"default" | "field_worker_done">("default");
   const [draftStatus, setDraftStatus] = useState<IssueStatus>("OPEN");
   const [draftDepartmentId, setDraftDepartmentId] = useState("");
+  const [draftAssignedToId, setDraftAssignedTo] = useState("");
 
   useEffect(() => {
     if (issue?.status) {
@@ -92,7 +93,7 @@ export function IssueDetailsPage() {
   }, [issue?.assigned_department_id]);
 
   const updateStatusMutation = useMutation({
-    mutationFn: (payload: { status?: IssueStatus; assigned_department_id?: string | null }) =>
+    mutationFn: (payload: { status?: IssueStatus; assigned_department_id?: string | null, assigned_to?: string | null }) =>
       updateIssueApi(id, payload),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["issue", id] });
@@ -159,6 +160,7 @@ export function IssueDetailsPage() {
 
     const hasStatusChanged = draftStatus !== issue.status;
     const hasDepartmentChanged = draftDepartmentId !== (issue.assigned_department_id ?? "");
+    const hasAssignedChanged = draftAssignedToId !== (issue.assigned_to ?? "")
 
     if (!hasStatusChanged && !hasDepartmentChanged) {
       setIsEditing(false);
@@ -168,7 +170,8 @@ export function IssueDetailsPage() {
     setSuccessAlertMode("default");
     updateStatusMutation.mutate({
       status: hasStatusChanged ? draftStatus : undefined,
-      assigned_department_id: hasDepartmentChanged ? draftDepartmentId || null : undefined
+      assigned_department_id: hasDepartmentChanged ? draftDepartmentId || null : undefined,
+      assigned_to: hasAssignedChanged ? draftAssignedToId || null : undefined
     });
   };
 
@@ -322,6 +325,9 @@ export function IssueDetailsPage() {
 
                 <FieldShell label="Category">
                   <InputLike>{categoryLabel}</InputLike>
+                </FieldShell>
+                <FieldShell label="Worker">
+                  <InputLike>***Placeholder***</InputLike>
                 </FieldShell>
 
                 <div>
