@@ -11,17 +11,17 @@ const DEFAULT_CENTER = { lat: 43.238949, lng: 76.889709 };
 
 export function ReportIssuePage() {
     const [title, setTitle] = useState("");
-    const [category, setCategory] = useState<"road" | "water" | "lighting" | "waste" | "safety"| "other" | "">("");
+    const [category, setCategory] = useState<"road" | "water" | "lighting" | "waste" | "safety" | "other" | "">("");
     const [description, setDescription] = useState("");
-    const [selectedCoords, setSelectedCoords] = useState<{lat: number, lng: number} | null>(null);
+    const [selectedCoords, setSelectedCoords] = useState<{ lat: number, lng: number } | null>(null);
     const [locationLabel, setLocationLabel] = useState("Click on map");
-    const [mapCenter, setMapCenter] = useState<{ lat:number; lng:number }>(DEFAULT_CENTER);
+    const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>(DEFAULT_CENTER);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const navigate = useNavigate();
-    const [photo,setPhoto] = useState<File | null>(null);
+    const [photo, setPhoto] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    const createMutation=useMutation({
+    const createMutation = useMutation({
         mutationFn: createIssueApi,
         onSuccess: () => {
             setTitle("");
@@ -38,7 +38,7 @@ export function ReportIssuePage() {
     });
 
     useEffect(() => {
-        if(!navigator.geolocation) return;
+        if (!navigator.geolocation) return;
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 setMapCenter({
@@ -57,9 +57,9 @@ export function ReportIssuePage() {
         );
     }, [])
 
-    async function handleMapClick(coords: {lat:number; lng:number }) {
+    async function handleMapClick(coords: { lat: number; lng: number }) {
         setSelectedCoords(coords);
-        try{
+        try {
             const res = await fetch(
                 `https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`
             );
@@ -67,20 +67,20 @@ export function ReportIssuePage() {
 
             const road = data.address?.road || data.address?.pedestrian || data.address?.residential;
             const house = data.address?.house_number;
-            if (data?.display_name){
+            if (data?.display_name) {
                 setLocationLabel(house ? `${road} ${house}` : road);
             } else {
                 setLocationLabel("Address not found");
             }
-        } catch(e) {
+        } catch (e) {
             console.error(e)
             setLocationLabel("Address unavailable")
         }
     }
 
-    function handleSubmit(e : React.FormEvent) {
+    function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (!title.trim() || !category.trim() || !description.trim()){
+        if (!title.trim() || !category.trim() || !description.trim()) {
             alert("Please fill in all fields");
             return;
         }
@@ -99,7 +99,7 @@ export function ReportIssuePage() {
             photo
         })
     }
-   
+
 
     return (
         <>
@@ -112,7 +112,7 @@ export function ReportIssuePage() {
                     <div className="h-[620px] rounded-[28px] bg-white shadow-sm overflow-hidden">
                         <div className="relative">
                             <StaticIssueMap center={mapCenter} selectedCoords={selectedCoords} onMapClick={handleMapClick} />
-                            
+
                             <div className="absolute left-8 top-8 z-[1000]">
                                 <p className="mb-2 text-[20px] font-semibold text-[#202020]">
                                     Location:
@@ -125,7 +125,7 @@ export function ReportIssuePage() {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div className="rounded-[20px] border border-[#2B2B2B]/15 bg-[#FFFFFF] px-8 py-10 shadow-sm">
                         <div className="text-center">
                             <h2 className="text-[22px] font-extrabold uppercase text-[#202020]">
@@ -174,7 +174,7 @@ export function ReportIssuePage() {
                                 <label className="mb-2 block text-[16px] text-[#202020]">
                                     Description:
                                 </label>
-                                <textarea 
+                                <textarea
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Issue Description..."
@@ -189,8 +189,8 @@ export function ReportIssuePage() {
                                     className="h-[44px] w-[180px] rounded-[8px] bg-[#2B2B2B] text-[16px] text-white transition hover:bg-[#202020]"
                                 >
                                     Upload Photo
-                                </button>    
-                            </div> 
+                                </button>
+                            </div>
                             <input
                                 ref={fileInputRef}
                                 type="file"
@@ -206,7 +206,7 @@ export function ReportIssuePage() {
                             ) : null}
 
                             <div className="pt-1 text-center">
-                                <button 
+                                <button
                                     type="submit"
                                     disabled={createMutation.isPending}
                                     className="h-[44px] w-[180px] rounded-[8px] bg-[#2E2E5A] text-[16px] font-medium text-white transition hover:bg-[#202020]"
@@ -240,8 +240,8 @@ export function ReportIssuePage() {
                                     View My Reports
                                 </Link>
 
-                                <button 
-                                    type="button" 
+                                <button
+                                    type="button"
                                     onClick={() => navigate("/map")}
                                     className="flex h-[60px] min-w-[240px] items-center justify-center rounded-full border border-[#000000] bg-[#FFFFFF] px-8 text-[20px] font-medium text-[#2E2E5A] transition hover:bg-[#F2F5F8]"
                                 >
@@ -252,7 +252,7 @@ export function ReportIssuePage() {
                     </div>
                 </div>
             ) : null}
-    </> 
+        </>
     )
 }
 
