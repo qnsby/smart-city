@@ -6,13 +6,16 @@ import type { Issue } from "../../types";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { LocateFixed, ZoomIn } from "lucide-react";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 // Fix default marker assets in Vite builds.
 delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png"
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow
 });
 
 export function IssuesMap({
@@ -29,7 +32,7 @@ export function IssuesMap({
   return (
     <div className="relative h-full w-full overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-card">
       <MapContainer center={[43.238949, 76.889709]} zoom={12} zoomControl={false} className="h-full w-full">
-
+        <MapAutoResize />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -90,6 +93,8 @@ export function StaticIssueMap({ center, selectedCoords, onMapClick }: {
   return (
     <div className="h-[620px] overflow-hidden rounded-[28px] border border-slate-200">
       <MapContainer center={[center.lat, center.lng]} zoom={14} zoomControl={false} className={`h-full w-full ${onMapClick ? "cursor-crosshair" : ""}`}>
+        <MapAutoResize />
+        <MapViewportCenter center={center} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -106,6 +111,45 @@ export function StaticIssueMap({ center, selectedCoords, onMapClick }: {
       </MapContainer>
     </div>
   );
+}
+
+function MapAutoResize() {
+  const map = useMap();
+
+  useEffect(() => {
+    const invalidate = () => {
+      map.invalidateSize();
+    };
+
+    invalidate();
+    const timerId = window.setTimeout(invalidate, 200);
+
+    window.addEventListener("resize", invalidate);
+
+    return () => {
+      window.clearTimeout(timerId);
+      window.removeEventListener("resize", invalidate);
+    };
+  }, [map]);
+
+  return null;
+}
+
+function MapViewportCenter({
+  center
+}: {
+  center: { lat: number; lng: number };
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView([center.lat, center.lng], map.getZoom(), {
+      animate: false
+    });
+    map.invalidateSize();
+  }, [center.lat, center.lng, map]);
+
+  return null;
 }
 
 function LocateButton() {
@@ -159,7 +203,7 @@ function LiveLocation() {
   useEffect(() => {
     if (!navigator.geolocation) return;
 
-    navigator.geolocation.watchPosition(
+    const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
@@ -174,6 +218,10 @@ function LiveLocation() {
         timeout: 15000
       }
     );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
   }, [map]);
 
   if (!position) return null;

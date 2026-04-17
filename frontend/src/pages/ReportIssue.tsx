@@ -7,13 +7,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import { RoundedSelect } from "../components/ui/RoundedSelect";
 
+const DEFAULT_CENTER = { lat: 43.238949, lng: 76.889709 };
+
 export function ReportIssuePage() {
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState<"road" | "water" | "lighting" | "waste" | "safety"| "other" | "">("");
     const [description, setDescription] = useState("");
     const [selectedCoords, setSelectedCoords] = useState<{lat: number, lng: number} | null>(null);
     const [locationLabel, setLocationLabel] = useState("Click on map");
-    const [mapCenter, setMapCenter] = useState<{ lat:number; lng:number } | null>(null);
+    const [mapCenter, setMapCenter] = useState<{ lat:number; lng:number }>(DEFAULT_CENTER);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const navigate = useNavigate();
     const [photo,setPhoto] = useState<File | null>(null);
@@ -45,7 +47,12 @@ export function ReportIssuePage() {
                 });
             },
             () => {
-                setMapCenter({ lat: 43.238949, lng: 76.889709})
+                setMapCenter(DEFAULT_CENTER)
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 8000,
+                maximumAge: 60000
             }
         );
     }, [])
