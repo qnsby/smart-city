@@ -1,8 +1,10 @@
 ﻿import { http, HttpResponse } from "msw";
+import type { JsonBodyType } from "msw";
 import { buildSummary, canViewIssue, fakeToken, mockIssues, mockPasswords, mockUsers, parseToken } from "./data";
 import type { Issue, IssueStatus, User } from "../types";
 
-function ok(data: unknown, status = 200) {
+
+function ok(data: JsonBodyType, status = 200) {
   return HttpResponse.json(data, { status });
 }
 
