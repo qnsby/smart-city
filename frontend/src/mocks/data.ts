@@ -8,42 +8,66 @@ export const mockUsers: User[] = [
     name: "Citizen A",
     email: "citizen@example.com",
     role: "citizen",
-    department_id: null
+    department_id: null,
+    first_name: "Citizen",
+    surname: "A",
+    phone_number: null,
+    address: null
   },
   {
     id: "u-operator-1",
     name: "Operator",
     email: "operator@example.com",
     role: "operator",
-    department_id: "GENERAL"
+    department_id: "GENERAL",
+    first_name: "System",
+    surname: "Operator",
+    phone_number: null,
+    address: null
   },
   {
     id: "u-dept-1",
     name: "Department Admin",
     email: "deptadmin@example.com",
     role: "department_admin",
-    department_id: "WATER"
+    department_id: "WATER",
+    first_name: "Department",
+    surname: "Admin",
+    phone_number: null,
+    address: null
   },
   {
     id: "u-worker-1",
     name: "Field Worker",
     email: "worker@example.com",
     role: "field_worker",
-    department_id: "WATER"
+    department_id: "WATER",
+    first_name: "Field",
+    surname: "Worker",
+    phone_number: null,
+    address: null
   },
   {
     id: "u-city-1",
     name: "City Supervisor",
     email: "admin@example.com",
     role: "city_supervisor",
-    department_id: null
+    department_id: null,
+    first_name: "City",
+    surname: "Supervisor",
+    phone_number: null,
+    address: null
   },
   {
     id: "u-super-1",
     name: "Super Admin",
     email: "superadmin@example.com",
     role: "superadmin",
-    department_id: null
+    department_id: null,
+    first_name: "Super",
+    surname: "Admin",
+    phone_number: null,
+    address: null
   }
 ];
 

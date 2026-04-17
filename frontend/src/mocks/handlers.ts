@@ -2,7 +2,7 @@
 import { buildSummary, canViewIssue, fakeToken, mockIssues, mockPasswords, mockUsers, parseToken } from "./data";
 import type { Issue, IssueStatus, User } from "../types";
 
-function ok<T>(data: T, status = 200) {
+function ok(data: unknown, status = 200) {
   return HttpResponse.json(data, { status });
 }
 
@@ -21,13 +21,17 @@ export const handlers = [
     if (mockUsers.some((u) => u.email === body.email)) {
       return ok({ message: "Email already exists" }, 409);
     }
-    const user = {
+    const user: User = {
       id: `u-${Date.now()}`,
       name: body.name,
       email: body.email,
       role: "citizen",
-      department_id: null
-    } as const;
+      department_id: null,
+      first_name: body.name,
+      surname: "",
+      phone_number: null,
+      address: null
+    };
     mockUsers.push(user);
     mockPasswords[user.email] = body.password;
     return ok({ id: user.id }, 201);
