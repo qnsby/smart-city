@@ -1,4 +1,4 @@
 data.sqlite
-src/data/
+data/
 node_modules/
 .env
