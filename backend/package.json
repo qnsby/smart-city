@@ -9,6 +9,7 @@
     "init:db": "prisma db push && node src/initDb.js",
     "postinstall": "prisma generate",
     "seed": "node src/seed.js",
+    "import:normalized": "node src/importNormalizedData.js",
     "prisma:generate": "prisma generate",
     "start": "node src/app.js"
   },

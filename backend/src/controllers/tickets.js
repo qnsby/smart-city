@@ -168,6 +168,18 @@ const ticketsController = {
 
     if (h3) where.h3Index = h3;
     if (req.user.role === "CITIZEN") where.createdById = req.user.id;
+    if (req.user.role === "DEPARTMENT_ADMIN") {
+      if (!req.user.department_id) {
+        return res.json({
+          count: 0,
+          page,
+          limit,
+          total: 0,
+          items: []
+        });
+      }
+      where.assignedDepartmentId = req.user.department_id;
+    }
     if (category) {
       where.category = {
         code: category === "LIGHTING" ? "LIGHT" : category === "WASTE" ? "TRASH" : category
@@ -369,20 +381,36 @@ const ticketsController = {
     }
 
     let nextAssignedToId = null;
+    let nextAssignedToUser = null;
     if (assignedToInputProvided) {
       if (assigned_to === null || assigned_to === "") {
         nextAssignedToId = null;
       } else {
         const user = await prisma.user.findUnique({
           where: { id: String(assigned_to) },
-          select: { id: true }
-        })
+          select: { id: true, role: true, departmentId: true }
+        });
 
         if (!user) {
-          return res.status(400).json({ error: "User not found" })
+          return res.status(400).json({ error: "User not found" });
+        }
+
+        if (user.role !== "FIELD_WORKER") {
+          return res.status(400).json({ error: "Assigned user must be a field worker" });
         }
 
         nextAssignedToId = user.id;
+        nextAssignedToUser = user;
+      }
+    }
+
+    if (assignedToInputProvided && nextAssignedToId) {
+      if (!nextDepartmentId) {
+        return res.status(400).json({ error: "Assign a department before assigning a field worker" });
+      }
+
+      if (nextAssignedToUser?.departmentId !== nextDepartmentId) {
+        return res.status(400).json({ error: "Field worker department must match ticket department" });
       }
     }
 

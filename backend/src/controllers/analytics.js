@@ -4,9 +4,40 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function startOfUtcDay(date) {
+  return new Date(`${date}T00:00:00.000Z`);
+}
+
+function endOfUtcDay(date) {
+  return new Date(`${date}T23:59:59.999Z`);
+}
+
+function buildTicketWhere(req, date) {
+  const where = {};
+
+  if (req.user?.role === "DEPARTMENT_ADMIN") {
+    if (!req.user.department_id) {
+      where.assignedDepartmentId = "__NO_DEPARTMENT__";
+      return where;
+    }
+    where.assignedDepartmentId = req.user.department_id;
+  }
+
+  if (date) {
+    where.createdAt = {
+      gte: startOfUtcDay(date),
+      lte: endOfUtcDay(date)
+    };
+  }
+
+  return where;
+}
+
 const analyticsController = {
   async getSummary(req, res) {
+    const where = buildTicketWhere(req);
     const tickets = await prisma.ticket.findMany({
+      where,
       include: {
         category: {
           select: { code: true }
@@ -54,11 +85,25 @@ const analyticsController = {
 
   async getH3Analytics(req, res) {
     const date = String(req.query.date || todayISO());
-    const items = await prisma.h3Aggregate.findMany({
-      where: { date },
-      orderBy: { ticketCount: "desc" },
-      take: 200
+    const where = buildTicketWhere(req, date);
+    const tickets = await prisma.ticket.findMany({
+      where,
+      select: {
+        h3Index: true
+      }
     });
+
+    const cellCounts = new Map();
+    tickets.forEach((ticket) => {
+      if (!ticket.h3Index) return;
+      cellCounts.set(ticket.h3Index, (cellCounts.get(ticket.h3Index) || 0) + 1);
+    });
+
+    const items = [...cellCounts.entries()]
+      .map(([h3Index, ticketCount]) => ({ h3Index, ticketCount }))
+      .sort((a, b) => b.ticketCount - a.ticketCount)
+      .slice(0, 200);
+
     return res.json({
       date,
       count: items.length,
@@ -68,11 +113,25 @@ const analyticsController = {
 
   async getTopCells(req, res) {
     const date = String(req.query.date || todayISO());
-    const items = await prisma.h3Aggregate.findMany({
-      where: { date },
-      orderBy: { ticketCount: "desc" },
-      take: 10
+    const where = buildTicketWhere(req, date);
+    const tickets = await prisma.ticket.findMany({
+      where,
+      select: {
+        h3Index: true
+      }
     });
+
+    const cellCounts = new Map();
+    tickets.forEach((ticket) => {
+      if (!ticket.h3Index) return;
+      cellCounts.set(ticket.h3Index, (cellCounts.get(ticket.h3Index) || 0) + 1);
+    });
+
+    const items = [...cellCounts.entries()]
+      .map(([h3Index, ticketCount]) => ({ h3Index, ticketCount }))
+      .sort((a, b) => b.ticketCount - a.ticketCount)
+      .slice(0, 10);
+
     return res.json({
       date,
       items: items.map((item) => ({ h3_index: item.h3Index, ticket_count: item.ticketCount }))
