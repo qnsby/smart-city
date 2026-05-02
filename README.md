@@ -1,87 +1,134 @@
 # Smart City Platform
 
-Smart City Platform is a full-stack incident management system for city issue reporting and workflow coordination. Citizens can submit reports on the map, operators and admins can process them, field workers can track assigned tasks, and supervisors can monitor city-wide activity through dashboards and analytics.
+## Team Members
 
-## Tech Stack
+- `Dias Konysbay 230103235`
+- `Adina Kenzhebekova 230103312`
+- `Yerdaulet Kaiyrbergen: 230103131`
+- `Temirlan Bakhytzhan: 230103123`
 
-- Frontend: React 18, Vite, TypeScript, React Router, TanStack Query, Tailwind CSS
-- Maps and charts: Leaflet, React Leaflet, Recharts
-- Backend: Node.js, Express, Prisma, JWT, bcryptjs, multer, h3-js
-- Database: PostgreSQL via Supabase
-- File storage: Supabase Storage for ticket photos
 
-## Core Capabilities
+## Project Overview
+Smart City Platform is a full-stack web application for reporting, tracking, assigning, and resolving city incidents. The system helps citizens submit urban issues, while operators, department admins, field workers, and supervisors coordinate the full incident workflow through role-based dashboards, maps, and analytics. 
 
-- JWT-based authentication with login, registration, and session restore
-- Role-based access control across frontend routes and backend endpoints
-- City issue reporting with category, location, description, and optional photo upload
-- Ticket lifecycle management: `NEW`, `IN_PROGRESS`, `DONE`, `REJECTED`
-- Department assignment and department-based visibility for workers
-- Audit logging for key ticket actions
-- Ticket status history tracking
-- H3 geospatial aggregation for hotspot analytics
-- Admin user management with editable role, email, and department
-- Dashboards for citizens, operators, admins, supervisors, and field workers
+The platform is designed as an incident management system for a smart city environment. It supports issue creation, workflow control, department assignment, audit tracking, and analytics for operational monitoring.
 
-## Roles And Access
+## Problem Statement
+Cities receive many public complaints and infrastructure reports every day, but these reports are often handled through fragmented channels such as phone calls, chats, spreadsheets, or manual forwarding. This creates several problems:
 
-Backend roles:
+- slow response and unclear ownership of incidents
+- poor visibility into issue status for citizens
+- weak coordination between operators, departments, and field workers
+- limited ability for supervisors to analyze trends and hotspots
+- no unified audit trail for operational decisions
 
-- `CITIZEN`: creates reports and sees only own tickets
-- `OPERATOR`: creates tickets, reviews queues, updates ticket status
-- `DEPARTMENT_ADMIN`: manages workflow, users, analytics, and ticket assignment
-- `FIELD_WORKER`: sees department-assigned work and updates status for own department
-- `CITY_SUPERVISOR`: views analytics, dashboards, users, and audit-level reporting
-- `SUPERADMIN`: full platform access
+This project solves that problem by providing a centralized digital platform where city issues can be reported, assigned, processed, monitored, and analyzed in one system.
 
-Frontend role mapping:
+## Proposed Solution
+The solution is a role-based Smart City incident platform with the following flow:
 
-- `citizen` -> `CITIZEN`
-- `operator` -> `OPERATOR`
-- `department_admin` -> `DEPARTMENT_ADMIN`
-- `field_worker` -> `FIELD_WORKER`
-- `city_supervisor` -> `CITY_SUPERVISOR`
-- `superadmin` -> `SUPERADMIN`
+1. Citizens submit reports with category, description, map location, and optional photo evidence.
+2. Operators and admins review incoming tickets and assign them to departments and field workers.
+3. Field workers process assigned incidents and update their status.
+4. Supervisors and admins monitor activity through analytics dashboards and geospatial summaries.
+5. The system stores audit logs and ticket history for traceability.
 
-## Frontend Pages
+## Main Features
+- User authentication and registration
+- Role-based access control
+- Ticket creation with map coordinates
+- Ticket assignment by department and worker
+- Workflow status management
+- Photo upload support
+- Audit logging and status history
+- Department-aware worker assignment
+- Analytics dashboards with charts and map-based insights
+- User administration for privileged roles
 
-Public pages:
+## User Roles
+- `CITIZEN`: creates reports and views own reports
+- `OPERATOR`: reviews queues, updates tickets, assigns departments and workers
+- `DEPARTMENT_ADMIN`: manages workflow and user access at department level
+- `FIELD_WORKER`: works only on assigned tasks
+- `CITY_SUPERVISOR`: monitors dashboards and analytics
+- `SUPERADMIN`: full system access
 
+## Tech Specs
+
+### Frontend
+- React 18
+- Vite
+- TypeScript
+- React Router
+- TanStack Query
+- Tailwind CSS
+- Recharts
+- Leaflet / React Leaflet
+
+### Backend
+- Node.js
+- Express
+- Prisma ORM
+- JWT authentication
+- bcryptjs
+- multer
+- h3-js
+
+### Database and Storage
+- PostgreSQL via Supabase
+- Supabase Storage for uploaded ticket photos
+
+## System Architecture
+- `frontend/`: client-side application with role-based pages and dashboards
+- `backend/`: REST API, authentication, business logic, database access
+- `data/`: normalized CSV datasets used for import and analytics preparation
+
+The frontend communicates with the backend through HTTP APIs. The backend uses Prisma to access PostgreSQL and stores uploaded images in Supabase Storage.
+
+## Project Structure
+```text
+smart-city/
+├─ backend/
+│  ├─ prisma/
+│  └─ src/
+├─ frontend/
+│  └─ src/
+├─ data/
+│  └─ normalized-smart-city/
+├─ README.md
+└─ .env
+```
+
+## Key Pages
+
+### Public
 - `/` - landing page
-- `/login` - sign in
+- `/login` - login page
 - `/register` - citizen registration
 
-Authenticated pages:
-
-- `/dashboard` - citizen dashboard with map and recent reports
-- `/reportIssue` - create a new issue
+### Authenticated
+- `/dashboard` - citizen dashboard
+- `/reportIssue` - report creation page
 - `/myReport` - citizen report history
 - `/issue/:id` - issue details
 
-Role-restricted pages:
+### Restricted
+- `/operator` - operator ticket queue
+- `/admin/issues` - workflow management
+- `/admin/dashboard` - admin analytics
+- `/admin/users` - user management
+- `/tasks` - field worker tasks
+- `/analyticsDashboard` - supervisor overview
+- `/analytics` - analytics dashboard
 
-- `/operator` - operator queue view for latest tickets
-- `/admin/issues` - workflow management table with filters and status updates
-- `/admin/dashboard` - analytics dashboard for admins
-- `/admin/users` - user and role management
-- `/tasks` - field worker task list
-- `/analyticsDashboard` - supervisor city overview
-- `/analytics` - supervisor analytics screen
+## API Summary
 
-## API Overview
-
-Health:
-
-- `GET /health`
-
-Auth:
-
+### Auth
 - `POST /auth/login`
 - `POST /auth/register`
 - `GET /auth/me`
 
-Tickets:
-
+### Tickets
 - `GET /tickets/departments`
 - `GET /tickets/getAll`
 - `GET /tickets/get/:id`
@@ -90,30 +137,17 @@ Tickets:
 - `DELETE /tickets/delete/:id`
 - `GET /tickets/audit/:id`
 
-Analytics:
-
+### Analytics
 - `GET /analytics/summary`
 - `GET /analytics/h3`
 - `GET /analytics/top-cells`
 
-Admin:
-
+### Admin
 - `GET /admin/users`
 - `PATCH /admin/users/:id`
 
-## Ticket Workflow
-
-1. A citizen, operator, department admin, or superadmin creates a ticket.
-2. The backend computes an H3 cell from latitude and longitude.
-3. The ticket starts with status `NEW`.
-4. Operators, department admins, field workers, or superadmins can move tickets through the workflow depending on role.
-5. Audit logs and status history are stored for important changes.
-6. Analytics endpoints aggregate ticket density by H3 cell and summarize operational metrics.
-
-## Data Model
-
-Main Prisma entities:
-
+## Database Model
+Main entities:
 - `Department`
 - `User`
 - `TicketCategory`
@@ -124,33 +158,20 @@ Main Prisma entities:
 - `AuditLog`
 - `H3Aggregate`
 
-Enums:
+Core enums:
+- `Role`
+- `TicketStatus`
 
-- `Role`: `CITIZEN`, `OPERATOR`, `DEPARTMENT_ADMIN`, `FIELD_WORKER`, `CITY_SUPERVISOR`, `SUPERADMIN`
-- `TicketStatus`: `NEW`, `IN_PROGRESS`, `DONE`, `REJECTED`
+## Setup Instructions
 
-## Project Structure
+### 1. Install dependencies
+```bash
+npm install
+npm --prefix backend install
+npm --prefix frontend install
+```
 
-- `backend/` - Express API, Prisma schema, seed/init scripts
-- `frontend/` - React client application
-- `.env` - shared root environment file used by the app setup
-
-Key backend files:
-
-- `backend/src/app.js` - API bootstrap and router registration
-- `backend/src/controllers/` - auth, tickets, analytics, admin logic
-- `backend/src/routes/` - Express route definitions
-- `backend/prisma/schema.prisma` - data model
-
-Key frontend files:
-
-- `frontend/src/main.tsx` - router and providers
-- `frontend/src/auth/` - auth context and protected routing
-- `frontend/src/components/layout/AppShell.tsx` - role-aware navigation shell
-- `frontend/src/pages/` - main application screens
-
-## Environment Variables
-
+### 2. Configure environment variables
 Create a root `.env` file:
 
 ```env
@@ -167,71 +188,45 @@ VITE_API_URL=http://localhost:3000
 VITE_USE_MSW=false
 ```
 
-Notes:
-
-- Supabase pooler usually uses port `6543`
-- URL-encode special characters in the database password
-- `VITE_API_URL` is consumed by the frontend
-- `CORS_ORIGIN` should match the frontend dev server origin
-
-## Installation
-
-```bash
-npm install
-npm --prefix backend install
-npm --prefix frontend install
-```
-
-## Database Setup
-
-Initialize schema and reference data:
-
+### 3. Initialize the database
 ```bash
 npm run init:db
 ```
 
-Optional demo data:
-
+### 4. Optional demo data
 ```bash
 npm run seed
 ```
 
-## Running Locally
-
-Start backend:
-
+### 5. Run the project
+Backend:
 ```bash
 npm run dev
 ```
 
-Start frontend:
-
+Frontend:
 ```bash
 npm --prefix frontend run dev
 ```
 
-Frontend default dev URL:
+## Default Local URLs
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:3000`
 
-- `http://localhost:5173`
+## Workflow Notes
+- New tickets enter the system with status `NEW`
+- Tickets can move through `NEW`, `IN_PROGRESS`, `DONE`, and `REJECTED`
+- Department assignment is controlled on the backend
+- Worker assignment must match the ticket department
+- Analytics use H3 geospatial indexing for area-based summaries
 
-Backend default API URL:
-
-- `http://localhost:3000`
-
-## Current Notes
-
-- The backend exposes analytics summary and H3 aggregation endpoints used by admin dashboards
-- Ticket photos are uploaded through `multer` and stored in Supabase Storage
-- Department management in the admin dashboard currently includes a UI stub on the frontend
-- The repository contains both a root `README.md` and a frontend-specific `frontend/README.md`; this file documents the full monorepo
+## Current Limitations / Notes
+- Google OAuth is not fully connected yet
+- Some analytics derive insights from current ticket data rather than a separate BI pipeline
+- The repository contains normalized CSV datasets for import and analytics support
 
 ## Troubleshooting
-
-- `ENOTFOUND`:
-  check the Supabase host in `SUPABASE_DB_URL`
-- `28P01 password authentication failed`:
-  verify username, password, and project ref in the pooler connection string
-- `401 Unauthorized`:
-  check `JWT_SECRET`, token freshness, and whether the request includes `Authorization: Bearer <token>`
-- CORS errors:
-  verify `CORS_ORIGIN` matches your frontend URL
+- `ENOTFOUND`: verify the Supabase host in `SUPABASE_DB_URL`
+- `28P01 password authentication failed`: verify database username, password, and project reference
+- `401 Unauthorized`: verify JWT secret and request token
+- CORS errors: ensure `CORS_ORIGIN` matches the frontend URL

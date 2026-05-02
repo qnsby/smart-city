@@ -45,7 +45,7 @@ export function DashboardPage() {
                 onSearchChange={setSearch}
             />
 
-            <div className="grid grid-cols-1 gap-10 xl:grid-cols-[864px_187px]">
+            <div className="grid grid-cols-1 gap-5 xl:grid-cols-[864px_187px]">
                 <div>
                     <div className="h-[833px] w-[864px] overflow-hidden rounded-[20px] bg-white shadow-sm">
                         {query.isLoading ? (

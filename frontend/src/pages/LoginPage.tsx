@@ -125,19 +125,7 @@ export function LoginPage() {
                                     </p>
                                 </div>
                             </div>
-                            <button
-                                type="button"
-                                className="mt-8 flex w-full items-center justify-center gap-3 rounded-[18px] border border-[#2B2B2B]/10 bg-[#FFFFFF] px-5 py-4 text-[18px] font-medium text-[#202020] shadow-sm transition hover:bg-[#F2F5F8]"
-                            >
-                                <img
-                                    src="https://www.svgrepo.com/show/475656/google-color.svg"
-                                    alt="Google"
-                                    className="h-7 w-7"
-                                />
-                                <span>
-                  Login with <span className="font-bold">google</span>
-                </span>
-                            </button>
+                            
                             {/*<div className="mt-6 rounded-2xl bg-white/70 p-3 text-xs text-slate-600">*/}
                             {/*  Backend demo: <br />*/}
                             {/*  superadmin / superadmin <br />*/}

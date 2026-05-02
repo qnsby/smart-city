@@ -56,7 +56,7 @@ export function SupervisorPage() {
 
                 <div className="mt-8 overflow-hidden rounded-[28px]">
                     <div className="h-[520px] w-full overflow-hidden rounded-[28px]">
-                        <StaticIssueMap center={center} />
+                        <StaticIssueMap center={center} issues={issues} />
                     </div>
                 </div>
             </div>

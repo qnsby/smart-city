@@ -71,7 +71,7 @@ const router = createBrowserRouter([
     ]
   },
   {
-    element: <ProtectedRoute roles={["field_worker", "superadmin"]} />,
+    element: <ProtectedRoute roles={["field_worker", "superadmin", "department_admin"]} />,
     children: [
       {
         element: <AppShell />,
@@ -82,7 +82,7 @@ const router = createBrowserRouter([
     ]
   },
   {
-    element: <ProtectedRoute roles={["city_supervisor", "superadmin"]} />,
+    element: <ProtectedRoute roles={["city_supervisor", "superadmin", "department_admin"]} />,
     children: [
       {
         element: <AppShell />,

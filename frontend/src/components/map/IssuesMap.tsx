@@ -10,6 +10,10 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
+const SHARED_TILE_URL = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+const SHARED_TILE_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; CARTO';
+
 // Fix default marker assets in Vite builds.
 delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -33,10 +37,7 @@ export function IssuesMap({
     <div className="relative h-full w-full overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-card">
       <MapContainer center={[43.238949, 76.889709]} zoom={12} zoomControl={false} className="h-full w-full">
         <MapAutoResize />
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer attribution={SHARED_TILE_ATTRIBUTION} url={SHARED_TILE_URL} />
         {clickable && onMapClick ? <MapClickCapture onMapClick={onMapClick} /> : null}
         <LiveLocation />
         <LocateButton />
@@ -84,8 +85,9 @@ function MapClickCapture({
   return null;
 }
 
-export function StaticIssueMap({ center, selectedCoords, onMapClick }: {
+export function StaticIssueMap({ center, issues, selectedCoords, onMapClick }: {
   center: { lat: number, lng: number } | null;
+  issues?: Issue[];
   selectedCoords?: { lat: number; lng: number } | null;
   onMapClick?: (coords: { lat: number, lng: number }) => void;
 }) {
@@ -95,14 +97,28 @@ export function StaticIssueMap({ center, selectedCoords, onMapClick }: {
       <MapContainer center={[center.lat, center.lng]} zoom={14} zoomControl={false} className={`h-full w-full ${onMapClick ? "cursor-crosshair" : ""}`}>
         <MapAutoResize />
         <MapViewportCenter center={center} />
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer attribution={SHARED_TILE_ATTRIBUTION} url={SHARED_TILE_URL} />
         {onMapClick ? <MapClickCapture onMapClick={onMapClick} /> : null}
         <LiveLocation />
         <LocateButton />
         <ZoomControl position="bottomright" />
+        <MarkerClusterGroup chunkedLoading>
+          {(issues ?? []).map((issue) => (
+            <Marker key={issue.id} position={[issue.lat, issue.lng]}>
+              <Popup>
+                <div className="space-y-1">
+                  <div className="font-medium">{issue.title}</div>
+                  <div className="text-xs text-slate-600">
+                    {issue.category} • {issue.status}
+                  </div>
+                  <Link className="text-xs text-emerald-700 underline" to={`/issue/${issue.id}`}>
+                    View details
+                  </Link>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MarkerClusterGroup>
         {selectedCoords ? (
           <Marker position={[selectedCoords.lat, selectedCoords.lng]}>
             <Popup>Selected location</Popup>

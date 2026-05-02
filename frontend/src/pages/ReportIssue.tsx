@@ -242,7 +242,7 @@ export function ReportIssuePage() {
 
                                 <button
                                     type="button"
-                                    onClick={() => navigate("/map")}
+                                    onClick={() => navigate("/dashboard")}
                                     className="flex h-[60px] min-w-[240px] items-center justify-center rounded-full border border-[#000000] bg-[#FFFFFF] px-8 text-[20px] font-medium text-[#2E2E5A] transition hover:bg-[#F2F5F8]"
                                 >
                                     Back to Dashboard

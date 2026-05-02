@@ -10,7 +10,7 @@ import { EmptyState } from "../components/ui/EmptyState";
 import { LoadingSkeleton } from "../components/ui/LoadingSkeleton";
 import { ActionAlert } from "../components/ui/Alert";
 import { RoundedSelect } from "../components/ui/RoundedSelect";
-import type { DepartmentOption, IssueStatus, WorkerOption } from "../types";
+import type { DepartmentOption, IssueStatus, User, WorkerOption } from "../types";
 import { canManageWorkflow } from "../utils/roles";
 import { useAuth } from "../auth/AuthProvider";
 import { getIssuePageTitle, getIssuePageBreadcrumbRoot } from "../utils/issuePageMeta"
@@ -136,17 +136,39 @@ export function IssueDetailsPage() {
   const workerOptions = useMemo<WorkerOption[]>(() => {
     const data = workersQuery.data;
     if (!data) return [];
-    const users = Array.isArray(data) ? data : data.items ?? [];
+    const users: User[] = Array.isArray(data) ? data : data.items ?? [];
     return users.map((user) => ({
       id: user.id,
       name: user.name
     }));
   }, [workersQuery.data]);
 
+  const filteredWorkerOptions = useMemo<WorkerOption[]>(() => {
+    const data = workersQuery.data;
+    if (!data) return [];
+    const users: User[] = Array.isArray(data) ? data : data.items ?? [];
+
+    return users
+      .filter((user) => user.role === "field_worker")
+      .filter((user) => !draftDepartmentId || user.department_id === draftDepartmentId)
+      .map((user) => ({
+        id: user.id,
+        name: user.name
+      }));
+  }, [draftDepartmentId, workersQuery.data]);
+
   const draftWorkerLabel = useMemo(() => {
     if (!draftAssignedToId) return "Not assigned";
     return workerOptions.find((worker) => worker.id === draftAssignedToId)?.name || "Not assigned";
   }, [draftAssignedToId, workerOptions]);
+
+  useEffect(() => {
+    if (!draftAssignedToId) return;
+    const stillAllowed = filteredWorkerOptions.some((worker) => worker.id === draftAssignedToId);
+    if (!stillAllowed) {
+      setDraftAssignedTo("");
+    }
+  }, [draftAssignedToId, filteredWorkerOptions]);
 
   const workerLabel = useMemo(() => {
     if (!issue) return "Not assigned";
@@ -365,7 +387,7 @@ export function IssueDetailsPage() {
                       onChange={setDraftAssignedTo}
                       options={[
                         { value: "", label: "Not assigned" },
-                        ...workerOptions.map((worker) => ({
+                        ...filteredWorkerOptions.map((worker) => ({
                           value: worker.id,
                           label: worker.name
                         }))
