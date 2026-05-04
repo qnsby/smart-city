@@ -61,7 +61,7 @@ export function IssueDetailsPage() {
     user?.role === "operator" || user?.role === "department_admin" || user?.role === "superadmin";
   const pageTitle = getIssuePageTitle(user?.role);
   const breadcrumbRoot = getIssuePageBreadcrumbRoot(user?.role);
-  const isFieldWorker = user?.role === "field_worker";
+  const isFieldWorker = user?.role === "field_worker" || "superadmin";
 
   const query = useQuery({
     queryKey: ["issue", id],
