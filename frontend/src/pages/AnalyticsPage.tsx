@@ -25,7 +25,7 @@ import {
   Ticket
 } from "lucide-react";
 import { CircleMarker, MapContainer, Popup, TileLayer, useMap } from "react-leaflet";
-import { listIssuesApi } from "../api/issues";
+import { listAllIssuesApi } from "../api/issues";
 import type { Issue, IssueStatus } from "../types";
 import { PageHeader } from "../components/layout/PageHeader";
 import "leaflet/dist/leaflet.css";
@@ -191,10 +191,10 @@ export function AnalyticsPage() {
 
   const issuesQuery = useQuery({
     queryKey: ["analytics-page-issues"],
-    queryFn: () => listIssuesApi({ page: 1, limit: 500 })
+    queryFn: () => listAllIssuesApi()
   });
 
-  const issues = issuesQuery.data?.items ?? [];
+  const issues = issuesQuery.data ?? [];
 
   const districtOptions = useMemo(() => {
     return Array.from(new Set(issues.map((issue) => getDistrictLabel(issue)))).sort();

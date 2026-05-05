@@ -26,7 +26,7 @@ export function canViewAnalytics(role: Role | null | undefined) {
 }
 
 export function canManageWorkflow(role: Role | null | undefined) {
-  return role === "operator" || role === "department_admin" || role === "superadmin";
+  return role === "operator" || role === "superadmin";
 }
 
 export function canManageUsers(role: Role | null | undefined) {

@@ -61,7 +61,7 @@ export function IssueDetailsPage() {
     user?.role === "operator" || user?.role === "department_admin" || user?.role === "superadmin";
   const pageTitle = getIssuePageTitle(user?.role);
   const breadcrumbRoot = getIssuePageBreadcrumbRoot(user?.role);
-  const isFieldWorker = user?.role === "field_worker" || "superadmin";
+  const isFieldWorker = user?.role === "field_worker";
 
   const query = useQuery({
     queryKey: ["issue", id],
@@ -149,7 +149,7 @@ export function IssueDetailsPage() {
     const users: User[] = Array.isArray(data) ? data : data.items ?? [];
 
     return users
-      .filter((user) => user.role === "field_worker")
+      .filter((user) => user.role === "field_worker" || user.role === "superadmin")
       .filter((user) => !draftDepartmentId || user.department_id === draftDepartmentId)
       .map((user) => ({
         id: user.id,

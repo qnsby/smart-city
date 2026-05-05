@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageHeader } from "../components/layout/PageHeader";
 import { listUsersApi, updateUserApi } from "../api/admin";
@@ -24,6 +24,7 @@ export function AdminUsersPage() {
   const queryClient = useQueryClient();
   const { push } = useToast();
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [draftByUserId, setDraftByUserId] = useState<
     Record<string, { role: Role; department_id: string }>
@@ -61,8 +62,39 @@ export function AdminUsersPage() {
   );
 
   const allUsers = usersQuery.data?.items ?? [];
-  const totalPages = Math.max(1, Math.ceil(allUsers.length / PAGE_LIMIT));
-  const pagedUsers = allUsers.slice((page - 1) * PAGE_LIMIT, page * PAGE_LIMIT);
+  const normalizedSearch = search.trim().toLowerCase();
+  const filteredUsers = useMemo(() => {
+    if (!normalizedSearch) return allUsers;
+
+    return allUsers.filter((user) => {
+      const roleLabel = roleOptions.find((option) => option.value === user.role)?.label ?? user.role;
+      const departmentName = user.department_id ? departmentMap[user.department_id] ?? "" : "";
+      const haystack = [
+        user.name,
+        user.email,
+        user.phone_number,
+        roleLabel,
+        departmentName
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(normalizedSearch);
+    });
+  }, [allUsers, departmentMap, normalizedSearch]);
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_LIMIT));
+  const pagedUsers = filteredUsers.slice((page - 1) * PAGE_LIMIT, page * PAGE_LIMIT);
+
+  useEffect(() => {
+    setPage(1);
+  }, [normalizedSearch]);
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
 
   const startEditing = (user: { id: string; role: Role; department_id?: string | null }) => {
     setEditingUserId(user.id);
@@ -131,17 +163,26 @@ export function AdminUsersPage() {
           <input
             type="text"
             placeholder="Search Users"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
             className="rounded-lg border border-slate-300 px-3 py-2 text-sm w-64"
           />
-          <button className="rounded-lg bg-[#FFFFFF] border border-[#D9D9D9] px-4 py-2 text-sm text-[#202020] font-medium transition hover:bg-[#F2F5F8]">
+          {/* <button className="rounded-lg bg-[#FFFFFF] border border-[#D9D9D9] px-4 py-2 text-sm text-[#202020] font-medium transition hover:bg-[#F2F5F8]">
             + Add User
-          </button>
+          </button> */}
         </div>
 
         {usersQuery.isLoading ? (
           <LoadingSkeleton rows={5} />
-        ) : !allUsers.length ? (
-          <EmptyState title="No users" description="The system did not return user records." />
+        ) : !filteredUsers.length ? (
+          <EmptyState
+            title="No users found"
+            description={
+              normalizedSearch
+                ? "No users match the current search."
+                : "The system did not return user records."
+            }
+          />
         ) : (
           <>
             <div className="overflow-x-auto overflow-y-visible">

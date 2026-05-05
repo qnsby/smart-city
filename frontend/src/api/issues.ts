@@ -123,6 +123,31 @@ export async function listIssuesApi(filters: IssueFilters) {
   } satisfies PaginatedResponse<Issue>;
 }
 
+export async function listAllIssuesApi(filters: Omit<IssueFilters, "page" | "limit"> = {}) {
+  const firstPage = await listIssuesApi({
+    ...filters,
+    page: 1,
+    limit: 100
+  });
+
+  const totalPages = Math.ceil(firstPage.total / firstPage.limit);
+  if (totalPages <= 1) {
+    return firstPage.items;
+  }
+
+  const remainingPages = await Promise.all(
+    Array.from({ length: totalPages - 1 }, (_, index) =>
+      listIssuesApi({
+        ...filters,
+        page: index + 2,
+        limit: firstPage.limit
+      })
+    )
+  );
+
+  return [firstPage, ...remainingPages].flatMap((page) => page.items);
+}
+
 export async function getIssueApi(id: string) {
   const { data } = await apiClient.get<BackendTicket>(`/tickets/get/${id}`);
   const issue = mapTicketToIssue(data);
