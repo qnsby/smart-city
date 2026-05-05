@@ -395,8 +395,8 @@ const ticketsController = {
           return res.status(400).json({ error: "User not found" });
         }
 
-        if (user.role !== "FIELD_WORKER") {
-          return res.status(400).json({ error: "Assigned user must be a field worker" });
+        if (user.role !== "FIELD_WORKER" && user.role !== "SUPERADMIN") {
+          return res.status(400).json({ error: "Assigned user must be a field worker or superadmin" });
         }
 
         nextAssignedToId = user.id;
@@ -405,11 +405,11 @@ const ticketsController = {
     }
 
     if (assignedToInputProvided && nextAssignedToId) {
-      if (!nextDepartmentId) {
+      if (!nextDepartmentId && nextAssignedToUser?.role === "FIELD_WORKER") {
         return res.status(400).json({ error: "Assign a department before assigning a field worker" });
       }
 
-      if (nextAssignedToUser?.departmentId !== nextDepartmentId) {
+      if (nextAssignedToUser?.role === "FIELD_WORKER" && nextAssignedToUser?.departmentId !== nextDepartmentId) {
         return res.status(400).json({ error: "Field worker department must match ticket department" });
       }
     }

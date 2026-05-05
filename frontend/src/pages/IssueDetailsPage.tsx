@@ -15,6 +15,8 @@ import { canManageWorkflow } from "../utils/roles";
 import { useAuth } from "../auth/AuthProvider";
 import { getIssuePageTitle, getIssuePageBreadcrumbRoot } from "../utils/issuePageMeta"
 import { Link } from "react-router-dom"
+import { useToast } from "../components/ui/ToastProvider";
+import { getApiErrorMessage } from "../utils/apiError";
 
 
 function humanizeStatus(status?: string) {
@@ -55,6 +57,7 @@ const statusOptions: Array<{ value: IssueStatus; label: string }> = [
 export function IssueDetailsPage() {
   const { id = "" } = useParams();
   const { user } = useAuth();
+  const { push } = useToast();
   const queryClient = useQueryClient();
   const canEdit = canManageWorkflow(user?.role);
   const canEditDepartment =
@@ -110,6 +113,9 @@ export function IssueDetailsPage() {
       await queryClient.invalidateQueries({ queryKey: ["issues"] });
       setIsEditing(false);
       setShowSuccessAlert(true);
+    },
+    onError: (error) => {
+      push("error", getApiErrorMessage(error, "Failed to update ticket"));
     }
   });
 
@@ -150,7 +156,7 @@ export function IssueDetailsPage() {
 
     return users
       .filter((user) => user.role === "field_worker" || user.role === "superadmin")
-      .filter((user) => !draftDepartmentId || user.department_id === draftDepartmentId)
+      .filter((user) => user.role === "superadmin" || !draftDepartmentId || user.department_id === draftDepartmentId)
       .map((user) => ({
         id: user.id,
         name: user.name

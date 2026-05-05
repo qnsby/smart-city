@@ -9,6 +9,7 @@ import { Pagination } from "../components/ui/Pagination";
 import { RoundedSelect } from "../components/ui/RoundedSelect";
 import type { Role } from "../types";
 import { listDepartmentsApi } from "../api/issues";
+import { getApiErrorMessage } from "../utils/apiError";
 
 const PAGE_LIMIT = 10;
 const roleOptions: Array<{ value: Role; label: string }> = [
@@ -50,7 +51,7 @@ export function AdminUsersPage() {
       push("success", "User updated");
       queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
     },
-    onError: () => push("error", "Failed to update user")
+    onError: (error) => push("error", getApiErrorMessage(error, "Failed to update user"))
   });
 
   const departmentsQuery = useQuery({
